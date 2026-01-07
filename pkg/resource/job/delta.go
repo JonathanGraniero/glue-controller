@@ -17,16 +17,15 @@ package job
 
 import (
 	"bytes"
-	"reflect"
 
 	ackcompare "github.com/aws-controllers-k8s/runtime/pkg/compare"
 	acktags "github.com/aws-controllers-k8s/runtime/pkg/tags"
+	"k8s.io/apimachinery/pkg/api/equality"
 )
 
 // Hack to avoid import errors during build...
 var (
 	_ = &bytes.Buffer{}
-	_ = &reflect.Method{}
 	_ = &acktags.Tags{}
 )
 
@@ -46,7 +45,7 @@ func newResourceDelta(
 	if len(a.ko.Spec.CodeGenConfigurationNodes) != len(b.ko.Spec.CodeGenConfigurationNodes) {
 		delta.Add("Spec.CodeGenConfigurationNodes", a.ko.Spec.CodeGenConfigurationNodes, b.ko.Spec.CodeGenConfigurationNodes)
 	} else if len(a.ko.Spec.CodeGenConfigurationNodes) > 0 {
-		if !reflect.DeepEqual(a.ko.Spec.CodeGenConfigurationNodes, b.ko.Spec.CodeGenConfigurationNodes) {
+		if !equality.Semantic.Equalities.DeepEqual(a.ko.Spec.CodeGenConfigurationNodes, b.ko.Spec.CodeGenConfigurationNodes) {
 			delta.Add("Spec.CodeGenConfigurationNodes", a.ko.Spec.CodeGenConfigurationNodes, b.ko.Spec.CodeGenConfigurationNodes)
 		}
 	}
@@ -213,7 +212,7 @@ func newResourceDelta(
 			delta.Add("Spec.Role", a.ko.Spec.Role, b.ko.Spec.Role)
 		}
 	}
-	if !reflect.DeepEqual(a.ko.Spec.RoleRef, b.ko.Spec.RoleRef) {
+	if !equality.Semantic.Equalities.DeepEqual(a.ko.Spec.RoleRef, b.ko.Spec.RoleRef) {
 		delta.Add("Spec.RoleRef", a.ko.Spec.RoleRef, b.ko.Spec.RoleRef)
 	}
 	if ackcompare.HasNilDifference(a.ko.Spec.SecurityConfiguration, b.ko.Spec.SecurityConfiguration) {
