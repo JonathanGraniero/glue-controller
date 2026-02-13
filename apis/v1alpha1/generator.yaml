@@ -7,7 +7,7 @@ ignore:
       - Crawler
       - CustomEntityType
       - DataQualityRuleset
-      - Database
+      # - Database
       - DevEndpoint
       - Integration
       - IntegrationResourceProperty
