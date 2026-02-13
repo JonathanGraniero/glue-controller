@@ -1,0 +1,29 @@
+// Copyright Amazon.com Inc. or its affiliates. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License"). You may
+// not use this file except in compliance with the License. A copy of the
+// License is located at
+//
+//     http://aws.amazon.com/apache2.0/
+//
+// or in the "license" file accompanying this file. This file is distributed
+// on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+// express or implied. See the License for the specific language governing
+// permissions and limitations under the License.
+
+package database
+
+import (
+	"fmt"
+
+	svcapitypes "github.com/aws-controllers-k8s/glue-controller/apis/v1alpha1"
+)
+
+// databaseARN returns the ARN of the Glue database with the given name.
+func databaseARN(database *svcapitypes.Database) string {
+	// TODO(a-hilaly): I know there could be other partitions, but I'm
+	// not sure how to determine at this level of abstraction. Probably
+	// something the SDK/runtime should handle. For now, we'll just use
+	// the `aws` partition.
+	return fmt.Sprintf("arn:aws:glue:%s:%s:database/%s", *database.Status.ACKResourceMetadata.Region, *database.Status.ACKResourceMetadata.OwnerAccountID, *database.Spec.Name)
+}
