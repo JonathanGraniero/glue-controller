@@ -72,5 +72,29 @@ resources:
       errors:
         404: 
          code: EntityNotFoundException
+  Database:
+    fields:
+      Name:
+        is_primary_key: true
+        from:
+          operation: GetDatabase
+          path: Name
+      Tags:
+        type: map[string]*string
+    hooks:
+      sdk_update_pre_build_request:
+        template_path: hooks/database/sdk_update_pre_build_request.go.tpl
+      sdk_update_post_build_request:
+        template_path: hooks/database/sdk_update_post_build_request.go.tpl
+      sdk_read_one_post_set_output:
+        template_path: hooks/database/sdk_read_one_post_set_output.go.tpl
+      sdk_file_end:
+        template_path: hooks/database/sdk_file_end.go.tpl
+    exceptions:
+      terminal_codes:
+        - InvalidInputException
+      errors:
+        404: 
+         code: EntityNotFoundException
 
       

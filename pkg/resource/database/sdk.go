@@ -104,6 +104,7 @@ func (rm *resourceManager) sdkFind(
 	rm.setStatusDefaults(ko)
 	arn := ackv1alpha1.AWSResourceName(databaseARN(ko))
 	ko.Status.ACKResourceMetadata.ARN = &arn
+	ko.Spec.Tags, err = rm.getTags(ctx, string(*ko.Status.ACKResourceMetadata.ARN))
 
 	return &resource{ko}, nil
 }
@@ -204,10 +205,10 @@ func (rm *resourceManager) newCreateRequestPayload(
 			}
 			f1.CreateTableDefaultPermissions = f1f0
 		}
-		if r.ko.Spec.DatabaseInput != nil && r.ko.Spec.DatabaseInput.Description != nil {
+		if r.ko.Spec.DatabaseInput.Description != nil {
 			f1.Description = r.ko.Spec.DatabaseInput.Description
 		}
-		if r.ko.Spec.DatabaseInput != nil && r.ko.Spec.DatabaseInput.FederatedDatabase != nil {
+		if r.ko.Spec.DatabaseInput.FederatedDatabase != nil {
 			f1f2 := &svcsdktypes.FederatedDatabase{}
 			if r.ko.Spec.DatabaseInput.FederatedDatabase.ConnectionName != nil {
 				f1f2.ConnectionName = r.ko.Spec.DatabaseInput.FederatedDatabase.ConnectionName
@@ -217,16 +218,16 @@ func (rm *resourceManager) newCreateRequestPayload(
 			}
 			f1.FederatedDatabase = f1f2
 		}
-		if r.ko.Spec.DatabaseInput != nil && r.ko.Spec.DatabaseInput.LocationURI != nil {
+		if r.ko.Spec.DatabaseInput.LocationURI != nil {
 			f1.LocationUri = r.ko.Spec.DatabaseInput.LocationURI
 		}
 		if r.ko.Spec.DatabaseInput.Name != nil {
 			f1.Name = r.ko.Spec.DatabaseInput.Name
 		}
-		if r.ko.Spec.DatabaseInput != nil && r.ko.Spec.DatabaseInput.Parameters != nil {
+		if r.ko.Spec.DatabaseInput.Parameters != nil {
 			f1.Parameters = aws.ToStringMap(r.ko.Spec.DatabaseInput.Parameters)
 		}
-		if r.ko.Spec.DatabaseInput != nil && r.ko.Spec.DatabaseInput.TargetDatabase != nil {
+		if r.ko.Spec.DatabaseInput.TargetDatabase != nil {
 			f1f6 := &svcsdktypes.DatabaseIdentifier{}
 			if r.ko.Spec.DatabaseInput.TargetDatabase.CatalogID != nil {
 				f1f6.CatalogId = r.ko.Spec.DatabaseInput.TargetDatabase.CatalogID
@@ -261,6 +262,16 @@ func (rm *resourceManager) sdkUpdate(
 	defer func() {
 		exit(err)
 	}()
+	if delta.DifferentAt("Spec.Tags") {
+		err := rm.syncTags(
+			ctx,
+			desired,
+			latest,
+		)
+		if err != nil {
+			return nil, err
+		}
+	}
 	if !delta.DifferentExcept("Spec.Tags") {
 		return desired, nil
 	}
@@ -327,10 +338,10 @@ func (rm *resourceManager) newUpdateRequestPayload(
 			}
 			f1.CreateTableDefaultPermissions = f1f0
 		}
-		if r.ko.Spec.DatabaseInput != nil && r.ko.Spec.DatabaseInput.Description != nil {
+		if r.ko.Spec.DatabaseInput.Description != nil {
 			f1.Description = r.ko.Spec.DatabaseInput.Description
 		}
-		if r.ko.Spec.DatabaseInput != nil && r.ko.Spec.DatabaseInput.FederatedDatabase != nil {
+		if r.ko.Spec.DatabaseInput.FederatedDatabase != nil {
 			f1f2 := &svcsdktypes.FederatedDatabase{}
 			if r.ko.Spec.DatabaseInput.FederatedDatabase.ConnectionName != nil {
 				f1f2.ConnectionName = r.ko.Spec.DatabaseInput.FederatedDatabase.ConnectionName
@@ -340,16 +351,16 @@ func (rm *resourceManager) newUpdateRequestPayload(
 			}
 			f1.FederatedDatabase = f1f2
 		}
-		if r.ko.Spec.DatabaseInput != nil && r.ko.Spec.DatabaseInput.LocationURI != nil {
+		if r.ko.Spec.DatabaseInput.LocationURI != nil {
 			f1.LocationUri = r.ko.Spec.DatabaseInput.LocationURI
 		}
 		if r.ko.Spec.DatabaseInput.Name != nil {
 			f1.Name = r.ko.Spec.DatabaseInput.Name
 		}
-		if r.ko.Spec.DatabaseInput != nil && r.ko.Spec.DatabaseInput.Parameters != nil {
+		if r.ko.Spec.DatabaseInput.Parameters != nil {
 			f1.Parameters = aws.ToStringMap(r.ko.Spec.DatabaseInput.Parameters)
 		}
-		if r.ko.Spec.DatabaseInput != nil && r.ko.Spec.DatabaseInput.TargetDatabase != nil {
+		if r.ko.Spec.DatabaseInput.TargetDatabase != nil {
 			f1f6 := &svcsdktypes.DatabaseIdentifier{}
 			if r.ko.Spec.DatabaseInput.TargetDatabase.CatalogID != nil {
 				f1f6.CatalogId = r.ko.Spec.DatabaseInput.TargetDatabase.CatalogID
@@ -529,7 +540,7 @@ func (rm *resourceManager) newDatabaseInput(
 	res *svcsdk.UpdateDatabaseInput,
 ) (interface{}, error) {
 	databaseInput := &svcsdktypes.DatabaseInput{}
-	if r.ko.Spec.DatabaseInput != nil && r.ko.Spec.DatabaseInput.CreateTableDefaultPermissions != nil {
+	if r.ko.Spec.DatabaseInput.CreateTableDefaultPermissions != nil {
 		databaseInputf0 := []svcsdktypes.PrincipalPermissions{}
 		for _, databaseInputf0iter := range r.ko.Spec.DatabaseInput.CreateTableDefaultPermissions {
 			databaseInputf0elem := &svcsdktypes.PrincipalPermissions{}
@@ -553,10 +564,10 @@ func (rm *resourceManager) newDatabaseInput(
 		}
 		databaseInput.CreateTableDefaultPermissions = databaseInputf0
 	}
-	if r.ko.Spec.DatabaseInput != nil && r.ko.Spec.DatabaseInput.Description != nil {
+	if r.ko.Spec.DatabaseInput.Description != nil {
 		databaseInput.Description = r.ko.Spec.DatabaseInput.Description
 	}
-	if r.ko.Spec.DatabaseInput != nil && r.ko.Spec.DatabaseInput.FederatedDatabase != nil {
+	if r.ko.Spec.DatabaseInput.FederatedDatabase != nil {
 		databaseInputf2 := &svcsdktypes.FederatedDatabase{}
 		if r.ko.Spec.DatabaseInput.FederatedDatabase.ConnectionName != nil {
 			databaseInputf2.ConnectionName = r.ko.Spec.DatabaseInput.FederatedDatabase.ConnectionName
@@ -566,16 +577,16 @@ func (rm *resourceManager) newDatabaseInput(
 		}
 		databaseInput.FederatedDatabase = databaseInputf2
 	}
-	if r.ko.Spec.DatabaseInput != nil && r.ko.Spec.DatabaseInput.LocationURI != nil {
+	if r.ko.Spec.DatabaseInput.LocationURI != nil {
 		databaseInput.LocationUri = r.ko.Spec.DatabaseInput.LocationURI
 	}
-	if r.ko.Spec.Name != nil {
-		databaseInput.Name = r.ko.Spec.Name
+	if r.ko.Spec.DatabaseInput.Name != nil {
+		databaseInput.Name = r.ko.Spec.DatabaseInput.Name
 	}
-	if r.ko.Spec.DatabaseInput != nil && r.ko.Spec.DatabaseInput.Parameters != nil {
+	if r.ko.Spec.DatabaseInput.Parameters != nil {
 		databaseInput.Parameters = aws.ToStringMap(r.ko.Spec.DatabaseInput.Parameters)
 	}
-	if r.ko.Spec.DatabaseInput != nil && r.ko.Spec.DatabaseInput.TargetDatabase != nil {
+	if r.ko.Spec.DatabaseInput.TargetDatabase != nil {
 		databaseInputf6 := &svcsdktypes.DatabaseIdentifier{}
 		if r.ko.Spec.DatabaseInput.TargetDatabase.CatalogID != nil {
 			databaseInputf6.CatalogId = r.ko.Spec.DatabaseInput.TargetDatabase.CatalogID

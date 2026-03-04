@@ -38,7 +38,7 @@ type DatabaseSpec struct {
 	// be all lowercase.
 	//
 	// Regex Pattern: `^[\u0020-\uD7FF\uE000-\uFFFD\uD800\uDC00-\uDBFF\uDFFF\t]*$`
-	Name *string `json:"name,omitempty"`
+	Name *string            `json:"name,omitempty"`
 	// The tags you assign to the database.
 	Tags map[string]*string `json:"tags,omitempty"`
 }
