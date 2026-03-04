@@ -1512,8 +1512,10 @@ spec:
                           type: string
                         piiType:
                           type: string
-                        sampleFraction: {}
-                        thresholdFraction: {}
+                        sampleFraction:
+                          type: number
+                        thresholdFraction:
+                          type: number
                       type: object
                     postgreSQLCatalogSource:
                       description: Specifies a PostgresSQL data source in the Glue
@@ -2670,7 +2672,8 @@ spec:
                           type: string
                         path:
                           type: string
-                        prob: {}
+                        prob:
+                          type: number
                         topk:
                           format: int64
                           type: integer
@@ -2867,6 +2870,7 @@ spec:
                       or Apache Spark streaming ETL job (JobCommand.Name="gluestreaming"), you
                       can allocate from 2 to 100 DPUs. The default is 10 DPUs. This job type
                       cannot have a fractional DPU allocation.
+                type: number
               maxRetries:
                 description: The maximum number of times to retry this job if it fails.
                 format: int64

@@ -47,6 +47,7 @@ type AuthenticationType string
 const (
 	AuthenticationType_BASIC  AuthenticationType = "BASIC"
 	AuthenticationType_CUSTOM AuthenticationType = "CUSTOM"
+	AuthenticationType_IAM    AuthenticationType = "IAM"
 	AuthenticationType_OAUTH2 AuthenticationType = "OAUTH2"
 )
 
@@ -152,6 +153,14 @@ const (
 	ComputationType_INCREMENTAL ComputationType = "INCREMENTAL"
 )
 
+type ComputeEnvironment string
+
+const (
+	ComputeEnvironment_ATHENA ComputeEnvironment = "ATHENA"
+	ComputeEnvironment_PYTHON ComputeEnvironment = "PYTHON"
+	ComputeEnvironment_SPARK  ComputeEnvironment = "SPARK"
+)
+
 type ConnectionPropertyKey string
 
 const (
@@ -169,6 +178,8 @@ const (
 	ConnectionPropertyKey_ENCRYPTED_KAFKA_SASL_PLAIN_PASSWORD      ConnectionPropertyKey = "ENCRYPTED_KAFKA_SASL_PLAIN_PASSWORD"
 	ConnectionPropertyKey_ENCRYPTED_KAFKA_SASL_SCRAM_PASSWORD      ConnectionPropertyKey = "ENCRYPTED_KAFKA_SASL_SCRAM_PASSWORD"
 	ConnectionPropertyKey_ENCRYPTED_PASSWORD                       ConnectionPropertyKey = "ENCRYPTED_PASSWORD"
+	ConnectionPropertyKey_ENDPOINT                                 ConnectionPropertyKey = "ENDPOINT"
+	ConnectionPropertyKey_ENDPOINT_TYPE                            ConnectionPropertyKey = "ENDPOINT_TYPE"
 	ConnectionPropertyKey_HOST                                     ConnectionPropertyKey = "HOST"
 	ConnectionPropertyKey_INSTANCE_ID                              ConnectionPropertyKey = "INSTANCE_ID"
 	ConnectionPropertyKey_JDBC_CONNECTION_URL                      ConnectionPropertyKey = "JDBC_CONNECTION_URL"
@@ -216,15 +227,34 @@ type ConnectionType string
 
 const (
 	ConnectionType_CUSTOM                   ConnectionType = "CUSTOM"
+	ConnectionType_FACEBOOKADS              ConnectionType = "FACEBOOKADS"
+	ConnectionType_GOOGLEADS                ConnectionType = "GOOGLEADS"
+	ConnectionType_GOOGLEANALYTICS4         ConnectionType = "GOOGLEANALYTICS4"
+	ConnectionType_GOOGLESHEETS             ConnectionType = "GOOGLESHEETS"
+	ConnectionType_HUBSPOT                  ConnectionType = "HUBSPOT"
+	ConnectionType_INSTAGRAMADS             ConnectionType = "INSTAGRAMADS"
+	ConnectionType_INTERCOM                 ConnectionType = "INTERCOM"
 	ConnectionType_JDBC                     ConnectionType = "JDBC"
+	ConnectionType_JIRACLOUD                ConnectionType = "JIRACLOUD"
 	ConnectionType_KAFKA                    ConnectionType = "KAFKA"
+	ConnectionType_MARKETO                  ConnectionType = "MARKETO"
 	ConnectionType_MARKETPLACE              ConnectionType = "MARKETPLACE"
 	ConnectionType_MONGODB                  ConnectionType = "MONGODB"
+	ConnectionType_NETSUITEERP              ConnectionType = "NETSUITEERP"
 	ConnectionType_NETWORK                  ConnectionType = "NETWORK"
 	ConnectionType_SALESFORCE               ConnectionType = "SALESFORCE"
+	ConnectionType_SALESFORCEMARKETINGCLOUD ConnectionType = "SALESFORCEMARKETINGCLOUD"
+	ConnectionType_SALESFORCEPARDOT         ConnectionType = "SALESFORCEPARDOT"
+	ConnectionType_SAPODATA                 ConnectionType = "SAPODATA"
+	ConnectionType_SERVICENOW               ConnectionType = "SERVICENOW"
 	ConnectionType_SFTP                     ConnectionType = "SFTP"
+	ConnectionType_SLACK                    ConnectionType = "SLACK"
+	ConnectionType_SNAPCHATADS              ConnectionType = "SNAPCHATADS"
+	ConnectionType_STRIPE                   ConnectionType = "STRIPE"
 	ConnectionType_VIEW_VALIDATION_ATHENA   ConnectionType = "VIEW_VALIDATION_ATHENA"
 	ConnectionType_VIEW_VALIDATION_REDSHIFT ConnectionType = "VIEW_VALIDATION_REDSHIFT"
+	ConnectionType_ZENDESK                  ConnectionType = "ZENDESK"
+	ConnectionType_ZOHOCRM                  ConnectionType = "ZOHOCRM"
 )
 
 type CrawlState string
@@ -307,6 +337,20 @@ const (
 	DataFormat_PROTOBUF DataFormat = "PROTOBUF"
 )
 
+type DataOperation string
+
+const (
+	DataOperation_READ  DataOperation = "READ"
+	DataOperation_WRITE DataOperation = "WRITE"
+)
+
+type DataQualityEncryptionMode string
+
+const (
+	DataQualityEncryptionMode_DISABLED DataQualityEncryptionMode = "DISABLED"
+	DataQualityEncryptionMode_SSE_KMS  DataQualityEncryptionMode = "SSE-KMS"
+)
+
 type DataQualityModelStatus string
 
 const (
@@ -358,6 +402,13 @@ const (
 	ExecutionClass_STANDARD ExecutionClass = "STANDARD"
 )
 
+type ExecutionStatus string
+
+const (
+	ExecutionStatus_FAILED  ExecutionStatus = "FAILED"
+	ExecutionStatus_STARTED ExecutionStatus = "STARTED"
+)
+
 type ExistCondition string
 
 const (
@@ -379,6 +430,41 @@ const (
 	FederationSourceErrorCode_OperationTimeoutException      FederationSourceErrorCode = "OperationTimeoutException"
 	FederationSourceErrorCode_PartialFailureException        FederationSourceErrorCode = "PartialFailureException"
 	FederationSourceErrorCode_ThrottlingException            FederationSourceErrorCode = "ThrottlingException"
+)
+
+type FieldDataType string
+
+const (
+	FieldDataType_ARRAY     FieldDataType = "ARRAY"
+	FieldDataType_BIGINT    FieldDataType = "BIGINT"
+	FieldDataType_BOOLEAN   FieldDataType = "BOOLEAN"
+	FieldDataType_BYTE      FieldDataType = "BYTE"
+	FieldDataType_DATE      FieldDataType = "DATE"
+	FieldDataType_DECIMAL   FieldDataType = "DECIMAL"
+	FieldDataType_DOUBLE    FieldDataType = "DOUBLE"
+	FieldDataType_FLOAT     FieldDataType = "FLOAT"
+	FieldDataType_INT       FieldDataType = "INT"
+	FieldDataType_LONG      FieldDataType = "LONG"
+	FieldDataType_MAP       FieldDataType = "MAP"
+	FieldDataType_SHORT     FieldDataType = "SHORT"
+	FieldDataType_SMALLINT  FieldDataType = "SMALLINT"
+	FieldDataType_STRING    FieldDataType = "STRING"
+	FieldDataType_STRUCT    FieldDataType = "STRUCT"
+	FieldDataType_TIMESTAMP FieldDataType = "TIMESTAMP"
+)
+
+type FieldFilterOperator string
+
+const (
+	FieldFilterOperator_BETWEEN                  FieldFilterOperator = "BETWEEN"
+	FieldFilterOperator_CONTAINS                 FieldFilterOperator = "CONTAINS"
+	FieldFilterOperator_EQUAL_TO                 FieldFilterOperator = "EQUAL_TO"
+	FieldFilterOperator_GREATER_THAN             FieldFilterOperator = "GREATER_THAN"
+	FieldFilterOperator_GREATER_THAN_OR_EQUAL_TO FieldFilterOperator = "GREATER_THAN_OR_EQUAL_TO"
+	FieldFilterOperator_LESS_THAN                FieldFilterOperator = "LESS_THAN"
+	FieldFilterOperator_LESS_THAN_OR_EQUAL_TO    FieldFilterOperator = "LESS_THAN_OR_EQUAL_TO"
+	FieldFilterOperator_NOT_EQUAL_TO             FieldFilterOperator = "NOT_EQUAL_TO"
+	FieldFilterOperator_ORDER_BY                 FieldFilterOperator = "ORDER_BY"
 )
 
 type FieldName string
@@ -457,6 +543,18 @@ type InclusionAnnotationValue string
 const (
 	InclusionAnnotationValue_EXCLUDE InclusionAnnotationValue = "EXCLUDE"
 	InclusionAnnotationValue_INCLUDE InclusionAnnotationValue = "INCLUDE"
+)
+
+type IntegrationStatus string
+
+const (
+	IntegrationStatus_ACTIVE          IntegrationStatus = "ACTIVE"
+	IntegrationStatus_CREATING        IntegrationStatus = "CREATING"
+	IntegrationStatus_DELETING        IntegrationStatus = "DELETING"
+	IntegrationStatus_FAILED          IntegrationStatus = "FAILED"
+	IntegrationStatus_MODIFYING       IntegrationStatus = "MODIFYING"
+	IntegrationStatus_NEEDS_ATTENTION IntegrationStatus = "NEEDS_ATTENTION"
+	IntegrationStatus_SYNCING         IntegrationStatus = "SYNCING"
 )
 
 type JDBCConnectionType string
@@ -689,6 +787,16 @@ const (
 	PrincipalType_USER  PrincipalType = "USER"
 )
 
+type PropertyType string
+
+const (
+	PropertyType_READ_ONLY            PropertyType = "READ_ONLY"
+	PropertyType_SECRET               PropertyType = "SECRET"
+	PropertyType_SECRET_OR_USER_INPUT PropertyType = "SECRET_OR_USER_INPUT"
+	PropertyType_UNUSED               PropertyType = "UNUSED"
+	PropertyType_USER_INPUT           PropertyType = "USER_INPUT"
+)
+
 type QuoteChar string
 
 const (
@@ -762,6 +870,13 @@ const (
 	ScheduleState_TRANSITIONING ScheduleState = "TRANSITIONING"
 )
 
+type ScheduleType string
+
+const (
+	ScheduleType_AUTO ScheduleType = "AUTO"
+	ScheduleType_CRON ScheduleType = "CRON"
+)
+
 type SchemaDiffType string
 
 const (
@@ -804,6 +919,13 @@ const (
 	SessionStatus_STOPPED      SessionStatus = "STOPPED"
 	SessionStatus_STOPPING     SessionStatus = "STOPPING"
 	SessionStatus_TIMEOUT      SessionStatus = "TIMEOUT"
+)
+
+type SettingSource string
+
+const (
+	SettingSource_CATALOG SettingSource = "CATALOG"
+	SettingSource_TABLE   SettingSource = "TABLE"
 )
 
 type Sort string
@@ -981,6 +1103,14 @@ type UnionType string
 const (
 	UnionType_ALL      UnionType = "ALL"
 	UnionType_DISTINCT UnionType = "DISTINCT"
+)
+
+type UnnestSpec string
+
+const (
+	UnnestSpec_FULL     UnnestSpec = "FULL"
+	UnnestSpec_NOUNNEST UnnestSpec = "NOUNNEST"
+	UnnestSpec_TOPLEVEL UnnestSpec = "TOPLEVEL"
 )
 
 type UpdateBehavior string

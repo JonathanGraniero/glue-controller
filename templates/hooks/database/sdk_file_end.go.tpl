@@ -9,7 +9,7 @@ func (rm *resourceManager) new{{ $dbFieldName }}(
         res *svcsdk.{{ $operation.InputRef.ShapeName }},
 ) (interface{}, error) {
     databaseInput := &svcsdktypes.{{ $dbFieldName }}{}
-{{ GoCodeSetSDKForStruct $CRD "" "databaseInput" $dbFieldMemberRef "" "r.ko.Spec" 1 }}
+{{ GoCodeSetSDKForStruct $CRD "" "databaseInput" $dbFieldMemberRef "" "r.ko.Spec.DatabaseInput" 1 }}
     res.DatabaseInput = databaseInput
 	return nil, nil
 }

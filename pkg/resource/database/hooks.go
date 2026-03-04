@@ -14,10 +14,29 @@
 package database
 
 import (
+	"context"
 	"fmt"
 
 	svcapitypes "github.com/aws-controllers-k8s/glue-controller/apis/v1alpha1"
+	util "github.com/aws-controllers-k8s/glue-controller/pkg/tags"
 )
+
+// getTags retrieves the resource's associated tags.
+func (rm *resourceManager) getTags(
+	ctx context.Context,
+	resourceARN string,
+) (map[string]*string, error) {
+	return util.GetResourceTags(ctx, rm.sdkapi, rm.metrics, resourceARN)
+}
+
+// syncTags keeps the resource's tags in sync.
+func (rm *resourceManager) syncTags(
+	ctx context.Context,
+	desired *resource,
+	latest *resource,
+) (err error) {
+	return util.SyncResourceTags(ctx, rm.sdkapi, rm.metrics, string(*latest.ko.Status.ACKResourceMetadata.ARN), desired.ko.Spec.Tags, latest.ko.Spec.Tags, convertToOrderedACKTags)
+}
 
 // databaseARN returns the ARN of the Glue database with the given name.
 func databaseARN(database *svcapitypes.Database) string {
