@@ -31,16 +31,31 @@ type DatabaseSpec struct {
 	//
 	// Regex Pattern: `^[\u0020-\uD7FF\uE000-\uFFFD\uD800\uDC00-\uDBFF\uDFFF\t]*$`
 	CatalogID *string `json:"catalogID,omitempty"`
-	// The metadata for the database.
-	// +kubebuilder:validation:Required
-	DatabaseInput *DatabaseInput `json:"databaseInput"`
+	// Creates a set of default permissions on the table for principals. Used by
+	// Lake Formation. Not used in the normal course of Glue operations.
+	CreateTableDefaultPermissions []*PrincipalPermissions `json:"createTableDefaultPermissions,omitempty"`
+	// A description of the database.
+	//
+	// Regex Pattern: `^[\u0020-\uD7FF\uE000-\uFFFD\uD800\uDC00-\uDBFF\uDFFF\r\n\t]*$`
+	Description *string `json:"description,omitempty"`
+	// A FederatedDatabase structure that references an entity outside the Glue
+	// Data Catalog.
+	FederatedDatabase *FederatedDatabase `json:"federatedDatabase,omitempty"`
+	// The location of the database (for example, an HDFS path).
+	//
+	// Regex Pattern: `^[\u0020-\uD7FF\uE000-\uFFFD\uD800\uDC00-\uDBFF\uDFFF\r\n\t]*$`
+	LocationURI *string `json:"locationURI,omitempty"`
 	// The name of the database to retrieve. For Hive compatibility, this should
 	// be all lowercase.
 	//
 	// Regex Pattern: `^[\u0020-\uD7FF\uE000-\uFFFD\uD800\uDC00-\uDBFF\uDFFF\t]*$`
-	Name *string            `json:"name,omitempty"`
-	// The tags you assign to the database.
-	Tags map[string]*string `json:"tags,omitempty"`
+	Name *string `json:"name,omitempty"`
+	// These key-value pairs define parameters and properties of the database.
+	Parameters map[string]*string `json:"parameters,omitempty"`
+	Tags       map[string]*string `json:"tags,omitempty"`
+	// A DatabaseIdentifier structure that describes a target database for resource
+	// linking.
+	TargetDatabase *DatabaseIdentifier `json:"targetDatabase,omitempty"`
 }
 
 // DatabaseStatus defines the observed state of Database

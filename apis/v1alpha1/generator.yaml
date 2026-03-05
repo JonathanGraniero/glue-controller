@@ -30,6 +30,8 @@ ignore:
       - Mapping.Children
       - CreateJobInput.AllocatedCapacity
       - UpdateJobInput.JobUpdate.AllocatedCapacity
+      - CreateDatabaseInput.DatabaseInput
+      - UpdateDatabaseInput.DatabaseInput
 resources:
   Job:
     renames:
@@ -79,9 +81,35 @@ resources:
         from:
           operation: GetDatabase
           path: Name
+      Description:
+        from:
+          operation: GetDatabase
+          path: Database.Description
+      LocationURI:
+        from:
+          operation: GetDatabase
+          path: Database.LocationUri
+      Parameters:
+        from:
+          operation: GetDatabase
+          path: Database.Parameters
+      CreateTableDefaultPermissions:
+        from:
+          operation: GetDatabase
+          path: Database.CreateTableDefaultPermissions
+      FederatedDatabase:
+        from:
+          operation: GetDatabase
+          path: Database.FederatedDatabase
+      TargetDatabase:
+        from:
+          operation: GetDatabase
+          path: Database.TargetDatabase
       Tags:
         type: map[string]*string
     hooks:
+      sdk_create_post_build_request:
+        template_path: hooks/database/sdk_create_post_build_request.go.tpl
       sdk_update_pre_build_request:
         template_path: hooks/database/sdk_update_pre_build_request.go.tpl
       sdk_update_post_build_request:
