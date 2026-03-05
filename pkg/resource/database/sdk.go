@@ -19,9 +19,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"reflect"
-	"strings"
-
 	ackv1alpha1 "github.com/aws-controllers-k8s/runtime/apis/core/v1alpha1"
 	ackcompare "github.com/aws-controllers-k8s/runtime/pkg/compare"
 	ackcondition "github.com/aws-controllers-k8s/runtime/pkg/condition"
@@ -30,10 +27,11 @@ import (
 	ackrtlog "github.com/aws-controllers-k8s/runtime/pkg/runtime/log"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	svcsdk "github.com/aws/aws-sdk-go-v2/service/glue"
-	svcsdktypes "github.com/aws/aws-sdk-go-v2/service/glue/types"
 	smithy "github.com/aws/smithy-go"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"reflect"
+	"strings"
 
 	svcapitypes "github.com/aws-controllers-k8s/glue-controller/apis/v1alpha1"
 )
@@ -95,13 +93,79 @@ func (rm *resourceManager) sdkFind(
 	} else {
 		ko.Spec.CatalogID = nil
 	}
+	if resp.Database.CreateTableDefaultPermissions != nil {
+		f1 := []*svcapitypes.PrincipalPermissions{}
+		for _, f1iter := range resp.Database.CreateTableDefaultPermissions {
+			f1elem := &svcapitypes.PrincipalPermissions{}
+			if f1iter.Permissions != nil {
+				f1elemf0 := []*string{}
+				for _, f1elemf0iter := range f1iter.Permissions {
+					var f1elemf0elem *string
+					f1elemf0elem = aws.String(string(f1elemf0iter))
+					f1elemf0 = append(f1elemf0, f1elemf0elem)
+				}
+				f1elem.Permissions = f1elemf0
+			}
+			if f1iter.Principal != nil {
+				f1elemf1 := &svcapitypes.DataLakePrincipal{}
+				if f1iter.Principal.DataLakePrincipalIdentifier != nil {
+					f1elemf1.DataLakePrincipalIdentifier = f1iter.Principal.DataLakePrincipalIdentifier
+				}
+				f1elem.Principal = f1elemf1
+			}
+			f1 = append(f1, f1elem)
+		}
+		ko.Spec.CreateTableDefaultPermissions = f1
+	} else {
+		ko.Spec.CreateTableDefaultPermissions = nil
+	}
+	if resp.Database.Description != nil {
+		ko.Spec.Description = resp.Database.Description
+	} else {
+		ko.Spec.Description = nil
+	}
+	if resp.Database.FederatedDatabase != nil {
+		f4 := &svcapitypes.FederatedDatabase{}
+		if resp.Database.FederatedDatabase.ConnectionName != nil {
+			f4.ConnectionName = resp.Database.FederatedDatabase.ConnectionName
+		}
+		if resp.Database.FederatedDatabase.Identifier != nil {
+			f4.Identifier = resp.Database.FederatedDatabase.Identifier
+		}
+		ko.Spec.FederatedDatabase = f4
+	} else {
+		ko.Spec.FederatedDatabase = nil
+	}
 	if resp.Database.Name != nil {
 		ko.Spec.Name = resp.Database.Name
 	} else {
 		ko.Spec.Name = nil
 	}
+	if resp.Database.Parameters != nil {
+		ko.Spec.Parameters = aws.StringMap(resp.Database.Parameters)
+	} else {
+		ko.Spec.Parameters = nil
+	}
+	if resp.Database.TargetDatabase != nil {
+		f8 := &svcapitypes.DatabaseIdentifier{}
+		if resp.Database.TargetDatabase.CatalogId != nil {
+			f8.CatalogID = resp.Database.TargetDatabase.CatalogId
+		}
+		if resp.Database.TargetDatabase.DatabaseName != nil {
+			f8.DatabaseName = resp.Database.TargetDatabase.DatabaseName
+		}
+		if resp.Database.TargetDatabase.Region != nil {
+			f8.Region = resp.Database.TargetDatabase.Region
+		}
+		ko.Spec.TargetDatabase = f8
+	} else {
+		ko.Spec.TargetDatabase = nil
+	}
 
 	rm.setStatusDefaults(ko)
+	if ko.Status.ACKResourceMetadata == nil {
+		ko.Status.ACKResourceMetadata = &ackv1alpha1.ResourceMetadata{}
+	}
 	arn := ackv1alpha1.AWSResourceName(databaseARN(ko))
 	ko.Status.ACKResourceMetadata.ARN = &arn
 	ko.Spec.Tags, err = rm.getTags(ctx, string(*ko.Status.ACKResourceMetadata.ARN))
@@ -152,6 +216,11 @@ func (rm *resourceManager) sdkCreate(
 	if err != nil {
 		return nil, err
 	}
+	databaseInput, err := rm.buildDatabaseInput(desired)
+	if err != nil {
+		return nil, err
+	}
+	input.DatabaseInput = databaseInput
 
 	var resp *svcsdk.CreateDatabaseOutput
 	_ = resp
@@ -178,69 +247,6 @@ func (rm *resourceManager) newCreateRequestPayload(
 
 	if r.ko.Spec.CatalogID != nil {
 		res.CatalogId = r.ko.Spec.CatalogID
-	}
-	if r.ko.Spec.DatabaseInput != nil {
-		f1 := &svcsdktypes.DatabaseInput{}
-		if r.ko.Spec.DatabaseInput.CreateTableDefaultPermissions != nil {
-			f1f0 := []svcsdktypes.PrincipalPermissions{}
-			for _, f1f0iter := range r.ko.Spec.DatabaseInput.CreateTableDefaultPermissions {
-				f1f0elem := &svcsdktypes.PrincipalPermissions{}
-				if f1f0iter.Permissions != nil {
-					f1f0elemf0 := []svcsdktypes.Permission{}
-					for _, f1f0elemf0iter := range f1f0iter.Permissions {
-						var f1f0elemf0elem string
-						f1f0elemf0elem = string(*f1f0elemf0iter)
-						f1f0elemf0 = append(f1f0elemf0, svcsdktypes.Permission(f1f0elemf0elem))
-					}
-					f1f0elem.Permissions = f1f0elemf0
-				}
-				if f1f0iter.Principal != nil {
-					f1f0elemf1 := &svcsdktypes.DataLakePrincipal{}
-					if f1f0iter.Principal.DataLakePrincipalIdentifier != nil {
-						f1f0elemf1.DataLakePrincipalIdentifier = f1f0iter.Principal.DataLakePrincipalIdentifier
-					}
-					f1f0elem.Principal = f1f0elemf1
-				}
-				f1f0 = append(f1f0, *f1f0elem)
-			}
-			f1.CreateTableDefaultPermissions = f1f0
-		}
-		if r.ko.Spec.DatabaseInput.Description != nil {
-			f1.Description = r.ko.Spec.DatabaseInput.Description
-		}
-		if r.ko.Spec.DatabaseInput.FederatedDatabase != nil {
-			f1f2 := &svcsdktypes.FederatedDatabase{}
-			if r.ko.Spec.DatabaseInput.FederatedDatabase.ConnectionName != nil {
-				f1f2.ConnectionName = r.ko.Spec.DatabaseInput.FederatedDatabase.ConnectionName
-			}
-			if r.ko.Spec.DatabaseInput.FederatedDatabase.Identifier != nil {
-				f1f2.Identifier = r.ko.Spec.DatabaseInput.FederatedDatabase.Identifier
-			}
-			f1.FederatedDatabase = f1f2
-		}
-		if r.ko.Spec.DatabaseInput.LocationURI != nil {
-			f1.LocationUri = r.ko.Spec.DatabaseInput.LocationURI
-		}
-		if r.ko.Spec.DatabaseInput.Name != nil {
-			f1.Name = r.ko.Spec.DatabaseInput.Name
-		}
-		if r.ko.Spec.DatabaseInput.Parameters != nil {
-			f1.Parameters = aws.ToStringMap(r.ko.Spec.DatabaseInput.Parameters)
-		}
-		if r.ko.Spec.DatabaseInput.TargetDatabase != nil {
-			f1f6 := &svcsdktypes.DatabaseIdentifier{}
-			if r.ko.Spec.DatabaseInput.TargetDatabase.CatalogID != nil {
-				f1f6.CatalogId = r.ko.Spec.DatabaseInput.TargetDatabase.CatalogID
-			}
-			if r.ko.Spec.DatabaseInput.TargetDatabase.DatabaseName != nil {
-				f1f6.DatabaseName = r.ko.Spec.DatabaseInput.TargetDatabase.DatabaseName
-			}
-			if r.ko.Spec.DatabaseInput.TargetDatabase.Region != nil {
-				f1f6.Region = r.ko.Spec.DatabaseInput.TargetDatabase.Region
-			}
-			f1.TargetDatabase = f1f6
-		}
-		res.DatabaseInput = f1
 	}
 	if r.ko.Spec.Tags != nil {
 		res.Tags = aws.ToStringMap(r.ko.Spec.Tags)
@@ -280,10 +286,11 @@ func (rm *resourceManager) sdkUpdate(
 	if err != nil {
 		return nil, err
 	}
-	_, err = rm.newDatabaseInput(desired, input)
+	databaseInput, err := rm.buildDatabaseInput(desired)
 	if err != nil {
 		return nil, err
 	}
+	input.DatabaseInput = databaseInput
 
 	var resp *svcsdk.UpdateDatabaseOutput
 	_ = resp
@@ -311,69 +318,6 @@ func (rm *resourceManager) newUpdateRequestPayload(
 
 	if r.ko.Spec.CatalogID != nil {
 		res.CatalogId = r.ko.Spec.CatalogID
-	}
-	if r.ko.Spec.DatabaseInput != nil {
-		f1 := &svcsdktypes.DatabaseInput{}
-		if r.ko.Spec.DatabaseInput.CreateTableDefaultPermissions != nil {
-			f1f0 := []svcsdktypes.PrincipalPermissions{}
-			for _, f1f0iter := range r.ko.Spec.DatabaseInput.CreateTableDefaultPermissions {
-				f1f0elem := &svcsdktypes.PrincipalPermissions{}
-				if f1f0iter.Permissions != nil {
-					f1f0elemf0 := []svcsdktypes.Permission{}
-					for _, f1f0elemf0iter := range f1f0iter.Permissions {
-						var f1f0elemf0elem string
-						f1f0elemf0elem = string(*f1f0elemf0iter)
-						f1f0elemf0 = append(f1f0elemf0, svcsdktypes.Permission(f1f0elemf0elem))
-					}
-					f1f0elem.Permissions = f1f0elemf0
-				}
-				if f1f0iter.Principal != nil {
-					f1f0elemf1 := &svcsdktypes.DataLakePrincipal{}
-					if f1f0iter.Principal.DataLakePrincipalIdentifier != nil {
-						f1f0elemf1.DataLakePrincipalIdentifier = f1f0iter.Principal.DataLakePrincipalIdentifier
-					}
-					f1f0elem.Principal = f1f0elemf1
-				}
-				f1f0 = append(f1f0, *f1f0elem)
-			}
-			f1.CreateTableDefaultPermissions = f1f0
-		}
-		if r.ko.Spec.DatabaseInput.Description != nil {
-			f1.Description = r.ko.Spec.DatabaseInput.Description
-		}
-		if r.ko.Spec.DatabaseInput.FederatedDatabase != nil {
-			f1f2 := &svcsdktypes.FederatedDatabase{}
-			if r.ko.Spec.DatabaseInput.FederatedDatabase.ConnectionName != nil {
-				f1f2.ConnectionName = r.ko.Spec.DatabaseInput.FederatedDatabase.ConnectionName
-			}
-			if r.ko.Spec.DatabaseInput.FederatedDatabase.Identifier != nil {
-				f1f2.Identifier = r.ko.Spec.DatabaseInput.FederatedDatabase.Identifier
-			}
-			f1.FederatedDatabase = f1f2
-		}
-		if r.ko.Spec.DatabaseInput.LocationURI != nil {
-			f1.LocationUri = r.ko.Spec.DatabaseInput.LocationURI
-		}
-		if r.ko.Spec.DatabaseInput.Name != nil {
-			f1.Name = r.ko.Spec.DatabaseInput.Name
-		}
-		if r.ko.Spec.DatabaseInput.Parameters != nil {
-			f1.Parameters = aws.ToStringMap(r.ko.Spec.DatabaseInput.Parameters)
-		}
-		if r.ko.Spec.DatabaseInput.TargetDatabase != nil {
-			f1f6 := &svcsdktypes.DatabaseIdentifier{}
-			if r.ko.Spec.DatabaseInput.TargetDatabase.CatalogID != nil {
-				f1f6.CatalogId = r.ko.Spec.DatabaseInput.TargetDatabase.CatalogID
-			}
-			if r.ko.Spec.DatabaseInput.TargetDatabase.DatabaseName != nil {
-				f1f6.DatabaseName = r.ko.Spec.DatabaseInput.TargetDatabase.DatabaseName
-			}
-			if r.ko.Spec.DatabaseInput.TargetDatabase.Region != nil {
-				f1f6.Region = r.ko.Spec.DatabaseInput.TargetDatabase.Region
-			}
-			f1.TargetDatabase = f1f6
-		}
-		res.DatabaseInput = f1
 	}
 	if r.ko.Spec.Name != nil {
 		res.Name = r.ko.Spec.Name
@@ -533,73 +477,4 @@ func (rm *resourceManager) terminalAWSError(err error) bool {
 	default:
 		return false
 	}
-}
-
-func (rm *resourceManager) newDatabaseInput(
-	r *resource,
-	res *svcsdk.UpdateDatabaseInput,
-) (interface{}, error) {
-	databaseInput := &svcsdktypes.DatabaseInput{}
-	if r.ko.Spec.DatabaseInput.CreateTableDefaultPermissions != nil {
-		databaseInputf0 := []svcsdktypes.PrincipalPermissions{}
-		for _, databaseInputf0iter := range r.ko.Spec.DatabaseInput.CreateTableDefaultPermissions {
-			databaseInputf0elem := &svcsdktypes.PrincipalPermissions{}
-			if databaseInputf0iter.Permissions != nil {
-				databaseInputf0elemf0 := []svcsdktypes.Permission{}
-				for _, databaseInputf0elemf0iter := range databaseInputf0iter.Permissions {
-					var databaseInputf0elemf0elem string
-					databaseInputf0elemf0elem = string(*databaseInputf0elemf0iter)
-					databaseInputf0elemf0 = append(databaseInputf0elemf0, svcsdktypes.Permission(databaseInputf0elemf0elem))
-				}
-				databaseInputf0elem.Permissions = databaseInputf0elemf0
-			}
-			if databaseInputf0iter.Principal != nil {
-				databaseInputf0elemf1 := &svcsdktypes.DataLakePrincipal{}
-				if databaseInputf0iter.Principal.DataLakePrincipalIdentifier != nil {
-					databaseInputf0elemf1.DataLakePrincipalIdentifier = databaseInputf0iter.Principal.DataLakePrincipalIdentifier
-				}
-				databaseInputf0elem.Principal = databaseInputf0elemf1
-			}
-			databaseInputf0 = append(databaseInputf0, *databaseInputf0elem)
-		}
-		databaseInput.CreateTableDefaultPermissions = databaseInputf0
-	}
-	if r.ko.Spec.DatabaseInput.Description != nil {
-		databaseInput.Description = r.ko.Spec.DatabaseInput.Description
-	}
-	if r.ko.Spec.DatabaseInput.FederatedDatabase != nil {
-		databaseInputf2 := &svcsdktypes.FederatedDatabase{}
-		if r.ko.Spec.DatabaseInput.FederatedDatabase.ConnectionName != nil {
-			databaseInputf2.ConnectionName = r.ko.Spec.DatabaseInput.FederatedDatabase.ConnectionName
-		}
-		if r.ko.Spec.DatabaseInput.FederatedDatabase.Identifier != nil {
-			databaseInputf2.Identifier = r.ko.Spec.DatabaseInput.FederatedDatabase.Identifier
-		}
-		databaseInput.FederatedDatabase = databaseInputf2
-	}
-	if r.ko.Spec.DatabaseInput.LocationURI != nil {
-		databaseInput.LocationUri = r.ko.Spec.DatabaseInput.LocationURI
-	}
-	if r.ko.Spec.DatabaseInput.Name != nil {
-		databaseInput.Name = r.ko.Spec.DatabaseInput.Name
-	}
-	if r.ko.Spec.DatabaseInput.Parameters != nil {
-		databaseInput.Parameters = aws.ToStringMap(r.ko.Spec.DatabaseInput.Parameters)
-	}
-	if r.ko.Spec.DatabaseInput.TargetDatabase != nil {
-		databaseInputf6 := &svcsdktypes.DatabaseIdentifier{}
-		if r.ko.Spec.DatabaseInput.TargetDatabase.CatalogID != nil {
-			databaseInputf6.CatalogId = r.ko.Spec.DatabaseInput.TargetDatabase.CatalogID
-		}
-		if r.ko.Spec.DatabaseInput.TargetDatabase.DatabaseName != nil {
-			databaseInputf6.DatabaseName = r.ko.Spec.DatabaseInput.TargetDatabase.DatabaseName
-		}
-		if r.ko.Spec.DatabaseInput.TargetDatabase.Region != nil {
-			databaseInputf6.Region = r.ko.Spec.DatabaseInput.TargetDatabase.Region
-		}
-		databaseInput.TargetDatabase = databaseInputf6
-	}
-
-	res.DatabaseInput = databaseInput
-	return nil, nil
 }

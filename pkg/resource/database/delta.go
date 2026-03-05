@@ -49,86 +49,43 @@ func newResourceDelta(
 			delta.Add("Spec.CatalogID", a.ko.Spec.CatalogID, b.ko.Spec.CatalogID)
 		}
 	}
-	if ackcompare.HasNilDifference(a.ko.Spec.DatabaseInput, b.ko.Spec.DatabaseInput) {
-		delta.Add("Spec.DatabaseInput", a.ko.Spec.DatabaseInput, b.ko.Spec.DatabaseInput)
-	} else if a.ko.Spec.DatabaseInput != nil && b.ko.Spec.DatabaseInput != nil {
-		if len(a.ko.Spec.DatabaseInput.CreateTableDefaultPermissions) != len(b.ko.Spec.DatabaseInput.CreateTableDefaultPermissions) {
-			delta.Add("Spec.DatabaseInput.CreateTableDefaultPermissions", a.ko.Spec.DatabaseInput.CreateTableDefaultPermissions, b.ko.Spec.DatabaseInput.CreateTableDefaultPermissions)
-		} else if len(a.ko.Spec.DatabaseInput.CreateTableDefaultPermissions) > 0 {
-			if !equality.Semantic.Equalities.DeepEqual(a.ko.Spec.DatabaseInput.CreateTableDefaultPermissions, b.ko.Spec.DatabaseInput.CreateTableDefaultPermissions) {
-				delta.Add("Spec.DatabaseInput.CreateTableDefaultPermissions", a.ko.Spec.DatabaseInput.CreateTableDefaultPermissions, b.ko.Spec.DatabaseInput.CreateTableDefaultPermissions)
+	if len(a.ko.Spec.CreateTableDefaultPermissions) != len(b.ko.Spec.CreateTableDefaultPermissions) {
+		delta.Add("Spec.CreateTableDefaultPermissions", a.ko.Spec.CreateTableDefaultPermissions, b.ko.Spec.CreateTableDefaultPermissions)
+	} else if len(a.ko.Spec.CreateTableDefaultPermissions) > 0 {
+		if !equality.Semantic.Equalities.DeepEqual(a.ko.Spec.CreateTableDefaultPermissions, b.ko.Spec.CreateTableDefaultPermissions) {
+			delta.Add("Spec.CreateTableDefaultPermissions", a.ko.Spec.CreateTableDefaultPermissions, b.ko.Spec.CreateTableDefaultPermissions)
+		}
+	}
+	if ackcompare.HasNilDifference(a.ko.Spec.Description, b.ko.Spec.Description) {
+		delta.Add("Spec.Description", a.ko.Spec.Description, b.ko.Spec.Description)
+	} else if a.ko.Spec.Description != nil && b.ko.Spec.Description != nil {
+		if *a.ko.Spec.Description != *b.ko.Spec.Description {
+			delta.Add("Spec.Description", a.ko.Spec.Description, b.ko.Spec.Description)
+		}
+	}
+	if ackcompare.HasNilDifference(a.ko.Spec.FederatedDatabase, b.ko.Spec.FederatedDatabase) {
+		delta.Add("Spec.FederatedDatabase", a.ko.Spec.FederatedDatabase, b.ko.Spec.FederatedDatabase)
+	} else if a.ko.Spec.FederatedDatabase != nil && b.ko.Spec.FederatedDatabase != nil {
+		if ackcompare.HasNilDifference(a.ko.Spec.FederatedDatabase.ConnectionName, b.ko.Spec.FederatedDatabase.ConnectionName) {
+			delta.Add("Spec.FederatedDatabase.ConnectionName", a.ko.Spec.FederatedDatabase.ConnectionName, b.ko.Spec.FederatedDatabase.ConnectionName)
+		} else if a.ko.Spec.FederatedDatabase.ConnectionName != nil && b.ko.Spec.FederatedDatabase.ConnectionName != nil {
+			if *a.ko.Spec.FederatedDatabase.ConnectionName != *b.ko.Spec.FederatedDatabase.ConnectionName {
+				delta.Add("Spec.FederatedDatabase.ConnectionName", a.ko.Spec.FederatedDatabase.ConnectionName, b.ko.Spec.FederatedDatabase.ConnectionName)
 			}
 		}
-		if ackcompare.HasNilDifference(a.ko.Spec.DatabaseInput.Description, b.ko.Spec.DatabaseInput.Description) {
-			delta.Add("Spec.DatabaseInput.Description", a.ko.Spec.DatabaseInput.Description, b.ko.Spec.DatabaseInput.Description)
-		} else if a.ko.Spec.DatabaseInput.Description != nil && b.ko.Spec.DatabaseInput.Description != nil {
-			if *a.ko.Spec.DatabaseInput.Description != *b.ko.Spec.DatabaseInput.Description {
-				delta.Add("Spec.DatabaseInput.Description", a.ko.Spec.DatabaseInput.Description, b.ko.Spec.DatabaseInput.Description)
+		if ackcompare.HasNilDifference(a.ko.Spec.FederatedDatabase.Identifier, b.ko.Spec.FederatedDatabase.Identifier) {
+			delta.Add("Spec.FederatedDatabase.Identifier", a.ko.Spec.FederatedDatabase.Identifier, b.ko.Spec.FederatedDatabase.Identifier)
+		} else if a.ko.Spec.FederatedDatabase.Identifier != nil && b.ko.Spec.FederatedDatabase.Identifier != nil {
+			if *a.ko.Spec.FederatedDatabase.Identifier != *b.ko.Spec.FederatedDatabase.Identifier {
+				delta.Add("Spec.FederatedDatabase.Identifier", a.ko.Spec.FederatedDatabase.Identifier, b.ko.Spec.FederatedDatabase.Identifier)
 			}
 		}
-		if ackcompare.HasNilDifference(a.ko.Spec.DatabaseInput.FederatedDatabase, b.ko.Spec.DatabaseInput.FederatedDatabase) {
-			delta.Add("Spec.DatabaseInput.FederatedDatabase", a.ko.Spec.DatabaseInput.FederatedDatabase, b.ko.Spec.DatabaseInput.FederatedDatabase)
-		} else if a.ko.Spec.DatabaseInput.FederatedDatabase != nil && b.ko.Spec.DatabaseInput.FederatedDatabase != nil {
-			if ackcompare.HasNilDifference(a.ko.Spec.DatabaseInput.FederatedDatabase.ConnectionName, b.ko.Spec.DatabaseInput.FederatedDatabase.ConnectionName) {
-				delta.Add("Spec.DatabaseInput.FederatedDatabase.ConnectionName", a.ko.Spec.DatabaseInput.FederatedDatabase.ConnectionName, b.ko.Spec.DatabaseInput.FederatedDatabase.ConnectionName)
-			} else if a.ko.Spec.DatabaseInput.FederatedDatabase.ConnectionName != nil && b.ko.Spec.DatabaseInput.FederatedDatabase.ConnectionName != nil {
-				if *a.ko.Spec.DatabaseInput.FederatedDatabase.ConnectionName != *b.ko.Spec.DatabaseInput.FederatedDatabase.ConnectionName {
-					delta.Add("Spec.DatabaseInput.FederatedDatabase.ConnectionName", a.ko.Spec.DatabaseInput.FederatedDatabase.ConnectionName, b.ko.Spec.DatabaseInput.FederatedDatabase.ConnectionName)
-				}
-			}
-			if ackcompare.HasNilDifference(a.ko.Spec.DatabaseInput.FederatedDatabase.Identifier, b.ko.Spec.DatabaseInput.FederatedDatabase.Identifier) {
-				delta.Add("Spec.DatabaseInput.FederatedDatabase.Identifier", a.ko.Spec.DatabaseInput.FederatedDatabase.Identifier, b.ko.Spec.DatabaseInput.FederatedDatabase.Identifier)
-			} else if a.ko.Spec.DatabaseInput.FederatedDatabase.Identifier != nil && b.ko.Spec.DatabaseInput.FederatedDatabase.Identifier != nil {
-				if *a.ko.Spec.DatabaseInput.FederatedDatabase.Identifier != *b.ko.Spec.DatabaseInput.FederatedDatabase.Identifier {
-					delta.Add("Spec.DatabaseInput.FederatedDatabase.Identifier", a.ko.Spec.DatabaseInput.FederatedDatabase.Identifier, b.ko.Spec.DatabaseInput.FederatedDatabase.Identifier)
-				}
-			}
-		}
-		if ackcompare.HasNilDifference(a.ko.Spec.DatabaseInput.LocationURI, b.ko.Spec.DatabaseInput.LocationURI) {
-			delta.Add("Spec.DatabaseInput.LocationURI", a.ko.Spec.DatabaseInput.LocationURI, b.ko.Spec.DatabaseInput.LocationURI)
-		} else if a.ko.Spec.DatabaseInput.LocationURI != nil && b.ko.Spec.DatabaseInput.LocationURI != nil {
-			if *a.ko.Spec.DatabaseInput.LocationURI != *b.ko.Spec.DatabaseInput.LocationURI {
-				delta.Add("Spec.DatabaseInput.LocationURI", a.ko.Spec.DatabaseInput.LocationURI, b.ko.Spec.DatabaseInput.LocationURI)
-			}
-		}
-		if ackcompare.HasNilDifference(a.ko.Spec.DatabaseInput.Name, b.ko.Spec.DatabaseInput.Name) {
-			delta.Add("Spec.DatabaseInput.Name", a.ko.Spec.DatabaseInput.Name, b.ko.Spec.DatabaseInput.Name)
-		} else if a.ko.Spec.DatabaseInput.Name != nil && b.ko.Spec.DatabaseInput.Name != nil {
-			if *a.ko.Spec.DatabaseInput.Name != *b.ko.Spec.DatabaseInput.Name {
-				delta.Add("Spec.DatabaseInput.Name", a.ko.Spec.DatabaseInput.Name, b.ko.Spec.DatabaseInput.Name)
-			}
-		}
-		if len(a.ko.Spec.DatabaseInput.Parameters) != len(b.ko.Spec.DatabaseInput.Parameters) {
-			delta.Add("Spec.DatabaseInput.Parameters", a.ko.Spec.DatabaseInput.Parameters, b.ko.Spec.DatabaseInput.Parameters)
-		} else if len(a.ko.Spec.DatabaseInput.Parameters) > 0 {
-			if !ackcompare.MapStringStringPEqual(a.ko.Spec.DatabaseInput.Parameters, b.ko.Spec.DatabaseInput.Parameters) {
-				delta.Add("Spec.DatabaseInput.Parameters", a.ko.Spec.DatabaseInput.Parameters, b.ko.Spec.DatabaseInput.Parameters)
-			}
-		}
-		if ackcompare.HasNilDifference(a.ko.Spec.DatabaseInput.TargetDatabase, b.ko.Spec.DatabaseInput.TargetDatabase) {
-			delta.Add("Spec.DatabaseInput.TargetDatabase", a.ko.Spec.DatabaseInput.TargetDatabase, b.ko.Spec.DatabaseInput.TargetDatabase)
-		} else if a.ko.Spec.DatabaseInput.TargetDatabase != nil && b.ko.Spec.DatabaseInput.TargetDatabase != nil {
-			if ackcompare.HasNilDifference(a.ko.Spec.DatabaseInput.TargetDatabase.CatalogID, b.ko.Spec.DatabaseInput.TargetDatabase.CatalogID) {
-				delta.Add("Spec.DatabaseInput.TargetDatabase.CatalogID", a.ko.Spec.DatabaseInput.TargetDatabase.CatalogID, b.ko.Spec.DatabaseInput.TargetDatabase.CatalogID)
-			} else if a.ko.Spec.DatabaseInput.TargetDatabase.CatalogID != nil && b.ko.Spec.DatabaseInput.TargetDatabase.CatalogID != nil {
-				if *a.ko.Spec.DatabaseInput.TargetDatabase.CatalogID != *b.ko.Spec.DatabaseInput.TargetDatabase.CatalogID {
-					delta.Add("Spec.DatabaseInput.TargetDatabase.CatalogID", a.ko.Spec.DatabaseInput.TargetDatabase.CatalogID, b.ko.Spec.DatabaseInput.TargetDatabase.CatalogID)
-				}
-			}
-			if ackcompare.HasNilDifference(a.ko.Spec.DatabaseInput.TargetDatabase.DatabaseName, b.ko.Spec.DatabaseInput.TargetDatabase.DatabaseName) {
-				delta.Add("Spec.DatabaseInput.TargetDatabase.DatabaseName", a.ko.Spec.DatabaseInput.TargetDatabase.DatabaseName, b.ko.Spec.DatabaseInput.TargetDatabase.DatabaseName)
-			} else if a.ko.Spec.DatabaseInput.TargetDatabase.DatabaseName != nil && b.ko.Spec.DatabaseInput.TargetDatabase.DatabaseName != nil {
-				if *a.ko.Spec.DatabaseInput.TargetDatabase.DatabaseName != *b.ko.Spec.DatabaseInput.TargetDatabase.DatabaseName {
-					delta.Add("Spec.DatabaseInput.TargetDatabase.DatabaseName", a.ko.Spec.DatabaseInput.TargetDatabase.DatabaseName, b.ko.Spec.DatabaseInput.TargetDatabase.DatabaseName)
-				}
-			}
-			if ackcompare.HasNilDifference(a.ko.Spec.DatabaseInput.TargetDatabase.Region, b.ko.Spec.DatabaseInput.TargetDatabase.Region) {
-				delta.Add("Spec.DatabaseInput.TargetDatabase.Region", a.ko.Spec.DatabaseInput.TargetDatabase.Region, b.ko.Spec.DatabaseInput.TargetDatabase.Region)
-			} else if a.ko.Spec.DatabaseInput.TargetDatabase.Region != nil && b.ko.Spec.DatabaseInput.TargetDatabase.Region != nil {
-				if *a.ko.Spec.DatabaseInput.TargetDatabase.Region != *b.ko.Spec.DatabaseInput.TargetDatabase.Region {
-					delta.Add("Spec.DatabaseInput.TargetDatabase.Region", a.ko.Spec.DatabaseInput.TargetDatabase.Region, b.ko.Spec.DatabaseInput.TargetDatabase.Region)
-				}
-			}
+	}
+	if ackcompare.HasNilDifference(a.ko.Spec.LocationURI, b.ko.Spec.LocationURI) {
+		delta.Add("Spec.LocationURI", a.ko.Spec.LocationURI, b.ko.Spec.LocationURI)
+	} else if a.ko.Spec.LocationURI != nil && b.ko.Spec.LocationURI != nil {
+		if *a.ko.Spec.LocationURI != *b.ko.Spec.LocationURI {
+			delta.Add("Spec.LocationURI", a.ko.Spec.LocationURI, b.ko.Spec.LocationURI)
 		}
 	}
 	if ackcompare.HasNilDifference(a.ko.Spec.Name, b.ko.Spec.Name) {
@@ -138,10 +95,42 @@ func newResourceDelta(
 			delta.Add("Spec.Name", a.ko.Spec.Name, b.ko.Spec.Name)
 		}
 	}
+	if len(a.ko.Spec.Parameters) != len(b.ko.Spec.Parameters) {
+		delta.Add("Spec.Parameters", a.ko.Spec.Parameters, b.ko.Spec.Parameters)
+	} else if len(a.ko.Spec.Parameters) > 0 {
+		if !ackcompare.MapStringStringPEqual(a.ko.Spec.Parameters, b.ko.Spec.Parameters) {
+			delta.Add("Spec.Parameters", a.ko.Spec.Parameters, b.ko.Spec.Parameters)
+		}
+	}
 	desiredACKTags, _ := convertToOrderedACKTags(a.ko.Spec.Tags)
 	latestACKTags, _ := convertToOrderedACKTags(b.ko.Spec.Tags)
 	if !ackcompare.MapStringStringEqual(desiredACKTags, latestACKTags) {
 		delta.Add("Spec.Tags", a.ko.Spec.Tags, b.ko.Spec.Tags)
+	}
+	if ackcompare.HasNilDifference(a.ko.Spec.TargetDatabase, b.ko.Spec.TargetDatabase) {
+		delta.Add("Spec.TargetDatabase", a.ko.Spec.TargetDatabase, b.ko.Spec.TargetDatabase)
+	} else if a.ko.Spec.TargetDatabase != nil && b.ko.Spec.TargetDatabase != nil {
+		if ackcompare.HasNilDifference(a.ko.Spec.TargetDatabase.CatalogID, b.ko.Spec.TargetDatabase.CatalogID) {
+			delta.Add("Spec.TargetDatabase.CatalogID", a.ko.Spec.TargetDatabase.CatalogID, b.ko.Spec.TargetDatabase.CatalogID)
+		} else if a.ko.Spec.TargetDatabase.CatalogID != nil && b.ko.Spec.TargetDatabase.CatalogID != nil {
+			if *a.ko.Spec.TargetDatabase.CatalogID != *b.ko.Spec.TargetDatabase.CatalogID {
+				delta.Add("Spec.TargetDatabase.CatalogID", a.ko.Spec.TargetDatabase.CatalogID, b.ko.Spec.TargetDatabase.CatalogID)
+			}
+		}
+		if ackcompare.HasNilDifference(a.ko.Spec.TargetDatabase.DatabaseName, b.ko.Spec.TargetDatabase.DatabaseName) {
+			delta.Add("Spec.TargetDatabase.DatabaseName", a.ko.Spec.TargetDatabase.DatabaseName, b.ko.Spec.TargetDatabase.DatabaseName)
+		} else if a.ko.Spec.TargetDatabase.DatabaseName != nil && b.ko.Spec.TargetDatabase.DatabaseName != nil {
+			if *a.ko.Spec.TargetDatabase.DatabaseName != *b.ko.Spec.TargetDatabase.DatabaseName {
+				delta.Add("Spec.TargetDatabase.DatabaseName", a.ko.Spec.TargetDatabase.DatabaseName, b.ko.Spec.TargetDatabase.DatabaseName)
+			}
+		}
+		if ackcompare.HasNilDifference(a.ko.Spec.TargetDatabase.Region, b.ko.Spec.TargetDatabase.Region) {
+			delta.Add("Spec.TargetDatabase.Region", a.ko.Spec.TargetDatabase.Region, b.ko.Spec.TargetDatabase.Region)
+		} else if a.ko.Spec.TargetDatabase.Region != nil && b.ko.Spec.TargetDatabase.Region != nil {
+			if *a.ko.Spec.TargetDatabase.Region != *b.ko.Spec.TargetDatabase.Region {
+				delta.Add("Spec.TargetDatabase.Region", a.ko.Spec.TargetDatabase.Region, b.ko.Spec.TargetDatabase.Region)
+			}
+		}
 	}
 
 	return delta
