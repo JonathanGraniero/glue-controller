@@ -68,13 +68,6 @@ func (rm *resourceManager) buildDatabaseInput(
 			Identifier:     r.ko.Spec.FederatedDatabase.Identifier,
 		}
 	}
-	if r.ko.Spec.TargetDatabase != nil {
-		databaseInput.TargetDatabase = &svcsdktypes.DatabaseIdentifier{
-			CatalogId:    r.ko.Spec.TargetDatabase.CatalogID,
-			DatabaseName: r.ko.Spec.TargetDatabase.DatabaseName,
-			Region:       r.ko.Spec.TargetDatabase.Region,
-		}
-	}
 	return databaseInput, nil
 }
 

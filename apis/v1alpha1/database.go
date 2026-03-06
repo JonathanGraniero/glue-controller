@@ -53,9 +53,6 @@ type DatabaseSpec struct {
 	// These key-value pairs define parameters and properties of the database.
 	Parameters map[string]*string `json:"parameters,omitempty"`
 	Tags       map[string]*string `json:"tags,omitempty"`
-	// A DatabaseIdentifier structure that describes a target database for resource
-	// linking.
-	TargetDatabase *DatabaseIdentifier `json:"targetDatabase,omitempty"`
 }
 
 // DatabaseStatus defines the observed state of Database

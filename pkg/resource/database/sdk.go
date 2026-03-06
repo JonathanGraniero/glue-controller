@@ -147,22 +147,6 @@ func (rm *resourceManager) sdkFind(
 	} else {
 		ko.Spec.Parameters = nil
 	}
-	if resp.Database.TargetDatabase != nil {
-		f8 := &svcapitypes.DatabaseIdentifier{}
-		if resp.Database.TargetDatabase.CatalogId != nil {
-			f8.CatalogID = resp.Database.TargetDatabase.CatalogId
-		}
-		if resp.Database.TargetDatabase.DatabaseName != nil {
-			f8.DatabaseName = resp.Database.TargetDatabase.DatabaseName
-		}
-		if resp.Database.TargetDatabase.Region != nil {
-			f8.Region = resp.Database.TargetDatabase.Region
-		}
-		ko.Spec.TargetDatabase = f8
-	} else {
-		ko.Spec.TargetDatabase = nil
-	}
-
 	rm.setStatusDefaults(ko)
 	if ko.Status.ACKResourceMetadata == nil {
 		ko.Status.ACKResourceMetadata = &ackv1alpha1.ResourceMetadata{}
@@ -235,6 +219,11 @@ func (rm *resourceManager) sdkCreate(
 	ko := desired.ko.DeepCopy()
 
 	rm.setStatusDefaults(ko)
+	if ko.Status.ACKResourceMetadata == nil {
+		ko.Status.ACKResourceMetadata = &ackv1alpha1.ResourceMetadata{}
+	}
+	arn := ackv1alpha1.AWSResourceName(databaseARN(ko))
+	ko.Status.ACKResourceMetadata.ARN = &arn
 	return &resource{ko}, nil
 }
 
