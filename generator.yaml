@@ -104,10 +104,6 @@ resources:
         from:
           operation: GetDatabase
           path: Database.FederatedDatabase
-      TargetDatabase:
-        from:
-          operation: GetDatabase
-          path: Database.TargetDatabase
       Tags:
         type: map[string]*string
     hooks:
