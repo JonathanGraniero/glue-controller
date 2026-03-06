@@ -45,8 +45,8 @@ type DatabaseSpec struct {
 	//
 	// Regex Pattern: `^[\u0020-\uD7FF\uE000-\uFFFD\uD800\uDC00-\uDBFF\uDFFF\r\n\t]*$`
 	LocationURI *string `json:"locationURI,omitempty"`
-	// The name of the database to retrieve. For Hive compatibility, this should
-	// be all lowercase.
+	// The name of the database. For Hive compatibility, this is folded to lowercase
+	// when it is stored.
 	//
 	// Regex Pattern: `^[\u0020-\uD7FF\uE000-\uFFFD\uD800\uDC00-\uDBFF\uDFFF\t]*$`
 	Name *string `json:"name,omitempty"`

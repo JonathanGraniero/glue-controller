@@ -475,13 +475,6 @@ type CodeGenConfigurationNode struct {
 	Union *Union `json:"union,omitempty"`
 }
 
-// A column in a Table.
-type Column struct {
-	Name       *string            `json:"name,omitempty"`
-	Parameters map[string]*string `json:"parameters,omitempty"`
-	Type       *string            `json:"type_,omitempty"`
-}
-
 // Encapsulates a column name that failed and the reason for failure.
 type ColumnError struct {
 	ColumnName *string `json:"columnName,omitempty"`
@@ -1373,12 +1366,6 @@ type KafkaStreamingSourceOptions struct {
 	StartingTimestamp      *metav1.Time `json:"startingTimestamp,omitempty"`
 	SubscribePattern       *string      `json:"subscribePattern,omitempty"`
 	TopicName              *string      `json:"topicName,omitempty"`
-}
-
-// A partition key pair consisting of a name and a type.
-type KeySchemaElement struct {
-	Name *string `json:"name,omitempty"`
-	Type *string `json:"type_,omitempty"`
 }
 
 // Additional options for the Amazon Kinesis streaming data source.

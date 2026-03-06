@@ -26,6 +26,9 @@ ignore:
       - UsageProfile
       - UserDefinedFunction
       - Workflow
+  shape_names:
+      - Column
+      - KeySchemaElement
   field_paths:
       - Mapping.Children
       - CreateJobInput.AllocatedCapacity
@@ -80,7 +83,7 @@ resources:
         is_primary_key: true
         from:
           operation: GetDatabase
-          path: Name
+          path: Database.Name
       Description:
         from:
           operation: GetDatabase
