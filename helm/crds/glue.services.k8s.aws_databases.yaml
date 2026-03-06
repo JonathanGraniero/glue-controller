@@ -3,7 +3,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.20.1
+    controller-gen.kubebuilder.io/version: v0.19.0
   name: databases.glue.services.k8s.aws
 spec:
   group: glue.services.k8s.aws
@@ -50,70 +50,64 @@ spec:
 
                   Regex Pattern: `^[\u0020-\uD7FF\uE000-\uFFFD\uD800\uDC00-\uDBFF\uDFFF\t]*$`
                 type: string
-              databaseInput:
-                description: The metadata for the database.
-                properties:
-                  createTableDefaultPermissions:
-                    items:
-                      description: Permissions granted to a principal.
+              createTableDefaultPermissions:
+                description: |-
+                  Creates a set of default permissions on the table for principals. Used by
+                  Lake Formation. Not used in the normal course of Glue operations.
+                items:
+                  description: Permissions granted to a principal.
+                  properties:
+                    permissions:
+                      items:
+                        type: string
+                      type: array
+                    principal:
+                      description: The Lake Formation principal.
                       properties:
-                        permissions:
-                          items:
-                            type: string
-                          type: array
-                        principal:
-                          description: The Lake Formation principal.
-                          properties:
-                            dataLakePrincipalIdentifier:
-                              type: string
-                          type: object
+                        dataLakePrincipalIdentifier:
+                          type: string
                       type: object
-                    type: array
-                  description:
+                  type: object
+                type: array
+              description:
+                description: |-
+                  A description of the database.
+
+                  Regex Pattern: `^[\u0020-\uD7FF\uE000-\uFFFD\uD800\uDC00-\uDBFF\uDFFF\r\n\t]*$`
+                type: string
+              federatedDatabase:
+                description: |-
+                  A FederatedDatabase structure that references an entity outside the Glue
+                  Data Catalog.
+                properties:
+                  connectionName:
                     type: string
-                  federatedDatabase:
-                    description: A database that points to an entity outside the Glue
-                      Data Catalog.
-                    properties:
-                      connectionName:
-                        type: string
-                      identifier:
-                        type: string
-                    type: object
-                  locationURI:
+                  identifier:
                     type: string
-                  name:
-                    type: string
-                  parameters:
-                    additionalProperties:
-                      type: string
-                    type: object
-                  targetDatabase:
-                    description: A structure that describes a target database for
-                      resource linking.
-                    properties:
-                      catalogID:
-                        type: string
-                      databaseName:
-                        type: string
-                      region:
-                        type: string
-                    type: object
                 type: object
+              locationURI:
+                description: |-
+                  The location of the database (for example, an HDFS path).
+
+                  Regex Pattern: `^[\u0020-\uD7FF\uE000-\uFFFD\uD800\uDC00-\uDBFF\uDFFF\r\n\t]*$`
+                type: string
               name:
                 description: |-
-                  The name of the database to retrieve. For Hive compatibility, this should
-                  be all lowercase.
+                  The name of the database. For Hive compatibility, this is folded to lowercase
+                  when it is stored.
 
                   Regex Pattern: `^[\u0020-\uD7FF\uE000-\uFFFD\uD800\uDC00-\uDBFF\uDFFF\t]*$`
                 type: string
+              parameters:
+                additionalProperties:
+                  type: string
+                description: These key-value pairs define parameters and properties
+                  of the database.
+                type: object
               tags:
                 additionalProperties:
                   type: string
-                description: The tags you assign to the database.
                 type: object
-            required:
-            - databaseInput
             type: object
           status:
             description: DatabaseStatus defines the observed state of Database
