@@ -107,5 +107,6 @@ func newResourceDelta(
 	if !ackcompare.MapStringStringEqual(desiredACKTags, latestACKTags) {
 		delta.Add("Spec.Tags", a.ko.Spec.Tags, b.ko.Spec.Tags)
 	}
+
 	return delta
 }

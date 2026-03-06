@@ -72,6 +72,7 @@ rules:
 - apiGroups:
   - glue.services.k8s.aws
   resources:
+  - databases
   - jobs
   verbs:
   - create
@@ -84,27 +85,8 @@ rules:
 - apiGroups:
   - glue.services.k8s.aws
   resources:
-  - databases
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - glue.services.k8s.aws
-  resources:
-  - jobs/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - glue.services.k8s.aws
-  resources:
   - databases/status
+  - jobs/status
   verbs:
   - get
   - patch

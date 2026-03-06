@@ -4,7 +4,7 @@
 
 image:
   repository: public.ecr.aws/aws-controllers-k8s/glue-controller
-  tag: 0.3.1
+  tag: 0.0.0-non-release-version
   pullPolicy: IfNotPresent
   pullSecrets: []
 
@@ -150,6 +150,7 @@ reconcile:
   # If empty, all resources will be reconciled.
   # If specified, only the listed resource kinds will be reconciled.
   resources:
+    - Database
     - Job
 
 serviceAccount:
