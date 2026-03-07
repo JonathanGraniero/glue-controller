@@ -14,9 +14,15 @@
 package table
 
 import (
+	"context"
 	"fmt"
+	"sort"
 
+	ackerr "github.com/aws-controllers-k8s/runtime/pkg/errors"
+	ackrequeue "github.com/aws-controllers-k8s/runtime/pkg/requeue"
+	ackrtlog "github.com/aws-controllers-k8s/runtime/pkg/runtime/log"
 	"github.com/aws/aws-sdk-go-v2/aws"
+	svcsdk "github.com/aws/aws-sdk-go-v2/service/glue"
 	svcsdktypes "github.com/aws/aws-sdk-go-v2/service/glue/types"
 
 	svcapitypes "github.com/aws-controllers-k8s/glue-controller/apis/v1alpha1"
@@ -336,6 +342,184 @@ func (rm *resourceManager) setStorageDescriptor(
 		}
 	}
 	return result
+}
+
+// getPartitionIndexes retrieves all partition indexes for the table, requeueing
+// if any index is still transitioning (CREATING or DELETING). Returns a terminal
+// error if an index is in FAILED state.
+func (rm *resourceManager) getPartitionIndexes(
+	ctx context.Context,
+	r *resource,
+) ([]*svcapitypes.PartitionIndex, error) {
+	rlog := ackrtlog.FromContext(ctx)
+	exit := rlog.Trace("rm.getPartitionIndexes")
+	var err error
+	defer func() { exit(err) }()
+
+	input := &svcsdk.GetPartitionIndexesInput{}
+	if r.ko.Spec.DatabaseName != nil {
+		input.DatabaseName = r.ko.Spec.DatabaseName
+	}
+	if r.ko.Spec.Name != nil {
+		input.TableName = r.ko.Spec.Name
+	}
+	if r.ko.Spec.CatalogID != nil {
+		input.CatalogId = r.ko.Spec.CatalogID
+	}
+
+	var result []*svcapitypes.PartitionIndex
+	for {
+		var resp *svcsdk.GetPartitionIndexesOutput
+		resp, err = rm.sdkapi.GetPartitionIndexes(ctx, input)
+		rm.metrics.RecordAPICall("READ_MANY", "GetPartitionIndexes", err)
+		if err != nil {
+			return nil, err
+		}
+		for _, desc := range resp.PartitionIndexDescriptorList {
+			switch desc.IndexStatus {
+			case svcsdktypes.PartitionIndexStatusCreating:
+				err = ackrequeue.NeededAfter(
+					fmt.Errorf("partition index %q is still being created", aws.ToString(desc.IndexName)),
+					ackrequeue.DefaultRequeueAfterDuration,
+				)
+				return nil, err
+			case svcsdktypes.PartitionIndexStatusDeleting:
+				// In-flight deletion; skip so the index is not counted as present.
+				continue
+			case svcsdktypes.PartitionIndexStatusFailed:
+				err = ackerr.NewTerminalError(
+					fmt.Errorf("partition index %q failed to create", aws.ToString(desc.IndexName)),
+				)
+				return nil, err
+			}
+			pi := &svcapitypes.PartitionIndex{IndexName: desc.IndexName}
+			for _, k := range desc.Keys {
+				kCopy := k.Name
+				pi.Keys = append(pi.Keys, kCopy)
+			}
+			result = append(result, pi)
+		}
+		if resp.NextToken == nil {
+			break
+		}
+		input.NextToken = resp.NextToken
+	}
+	return result, nil
+}
+
+// syncPartitionIndexes reconciles the desired partition indexes against the
+// current state by calling CreatePartitionIndex for additions and
+// DeletePartitionIndex for removals.
+func (rm *resourceManager) syncPartitionIndexes(
+	ctx context.Context,
+	desired *resource,
+	latest *resource,
+) error {
+	rlog := ackrtlog.FromContext(ctx)
+	exit := rlog.Trace("rm.syncPartitionIndexes")
+	var err error
+	defer func() { exit(err) }()
+
+	desiredByName := map[string]*svcapitypes.PartitionIndex{}
+	for _, pi := range desired.ko.Spec.PartitionIndexes {
+		if pi != nil && pi.IndexName != nil {
+			desiredByName[*pi.IndexName] = pi
+		}
+	}
+	currentByName := map[string]*svcapitypes.PartitionIndex{}
+	for _, pi := range latest.ko.Spec.PartitionIndexes {
+		if pi != nil && pi.IndexName != nil {
+			currentByName[*pi.IndexName] = pi
+		}
+	}
+
+	for name, pi := range desiredByName {
+		if _, exists := currentByName[name]; exists {
+			continue
+		}
+		keys := make([]string, 0, len(pi.Keys))
+		for _, k := range pi.Keys {
+			if k != nil {
+				keys = append(keys, *k)
+			}
+		}
+		input := &svcsdk.CreatePartitionIndexInput{
+			DatabaseName: desired.ko.Spec.DatabaseName,
+			TableName:    desired.ko.Spec.Name,
+			PartitionIndex: &svcsdktypes.PartitionIndex{
+				IndexName: pi.IndexName,
+				Keys:      keys,
+			},
+		}
+		if desired.ko.Spec.CatalogID != nil {
+			input.CatalogId = desired.ko.Spec.CatalogID
+		}
+		_, err = rm.sdkapi.CreatePartitionIndex(ctx, input)
+		rm.metrics.RecordAPICall("CREATE", "CreatePartitionIndex", err)
+		if err != nil {
+			return err
+		}
+	}
+
+	for name := range currentByName {
+		if _, exists := desiredByName[name]; exists {
+			continue
+		}
+		nameCopy := name
+		input := &svcsdk.DeletePartitionIndexInput{
+			DatabaseName: desired.ko.Spec.DatabaseName,
+			TableName:    desired.ko.Spec.Name,
+			IndexName:    &nameCopy,
+		}
+		if desired.ko.Spec.CatalogID != nil {
+			input.CatalogId = desired.ko.Spec.CatalogID
+		}
+		_, err = rm.sdkapi.DeletePartitionIndex(ctx, input)
+		rm.metrics.RecordAPICall("DELETE", "DeletePartitionIndex", err)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// partitionIndexesMatch returns true if both slices contain the same set of
+// partition indexes (by name and keys), regardless of order.
+func partitionIndexesMatch(a, b []*svcapitypes.PartitionIndex) bool {
+	byName := func(pis []*svcapitypes.PartitionIndex) map[string][]string {
+		m := make(map[string][]string, len(pis))
+		for _, pi := range pis {
+			if pi == nil || pi.IndexName == nil {
+				continue
+			}
+			keys := make([]string, 0, len(pi.Keys))
+			for _, k := range pi.Keys {
+				if k != nil {
+					keys = append(keys, *k)
+				}
+			}
+			sort.Strings(keys)
+			m[*pi.IndexName] = keys
+		}
+		return m
+	}
+	aMap := byName(a)
+	bMap := byName(b)
+	if len(aMap) != len(bMap) {
+		return false
+	}
+	for name, aKeys := range aMap {
+		bKeys, ok := bMap[name]
+		if !ok || len(aKeys) != len(bKeys) {
+			return false
+		}
+		for i := range aKeys {
+			if aKeys[i] != bKeys[i] {
+				return false
+			}
+		}
+	}
+	return true
 }
 
 // tableARN returns the ARN of the Glue table.

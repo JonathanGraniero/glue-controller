@@ -41,6 +41,8 @@ func newResourceDelta(
 	}
 
 	// CatalogID is auto-populated by AWS and not user-settable; skip comparison.
+	// OpenTableFormatInput is create-only; GetTable does not return it, so comparing
+	// desired vs. observed would always produce a spurious diff.
 	if ackcompare.HasNilDifference(a.ko.Spec.DatabaseName, b.ko.Spec.DatabaseName) {
 		delta.Add("Spec.DatabaseName", a.ko.Spec.DatabaseName, b.ko.Spec.DatabaseName)
 	} else if a.ko.Spec.DatabaseName != nil && b.ko.Spec.DatabaseName != nil {
@@ -74,6 +76,13 @@ func newResourceDelta(
 	} else if len(a.ko.Spec.Parameters) > 0 {
 		if !ackcompare.MapStringStringPEqual(a.ko.Spec.Parameters, b.ko.Spec.Parameters) {
 			delta.Add("Spec.Parameters", a.ko.Spec.Parameters, b.ko.Spec.Parameters)
+		}
+	}
+	if len(a.ko.Spec.PartitionIndexes) != len(b.ko.Spec.PartitionIndexes) {
+		delta.Add("Spec.PartitionIndexes", a.ko.Spec.PartitionIndexes, b.ko.Spec.PartitionIndexes)
+	} else if len(a.ko.Spec.PartitionIndexes) > 0 {
+		if !partitionIndexesMatch(a.ko.Spec.PartitionIndexes, b.ko.Spec.PartitionIndexes) {
+			delta.Add("Spec.PartitionIndexes", a.ko.Spec.PartitionIndexes, b.ko.Spec.PartitionIndexes)
 		}
 	}
 	if len(a.ko.Spec.PartitionKeys) != len(b.ko.Spec.PartitionKeys) {

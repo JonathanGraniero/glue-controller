@@ -1580,7 +1580,15 @@ type Partition struct {
 
 // A structure for a partition index.
 type PartitionIndex struct {
-	IndexName *string `json:"indexName,omitempty"`
+	// The name of the partition index.
+	//
+	// +kubebuilder:validation:Required
+	IndexName *string `json:"indexName"`
+
+	// The keys (column names) for the partition index.
+	//
+	// +kubebuilder:validation:Required
+	Keys []*string `json:"keys"`
 }
 
 // A descriptor for a partition index in a table.
@@ -2236,6 +2244,23 @@ type TableIdentifier struct {
 	DatabaseName *string `json:"databaseName,omitempty"`
 	Name         *string `json:"name,omitempty"`
 	Region       *string `json:"region,omitempty"`
+}
+
+// Specifies an Apache Iceberg data store stored in Amazon S3.
+type IcebergInput struct {
+	// A required metadata operation. The only allowed value is "CREATE".
+	//
+	// +kubebuilder:validation:Required
+	MetadataOperation *string `json:"metadataOperation"`
+
+	// The table version for the Iceberg table. Defaults to 2.
+	Version *string `json:"version,omitempty"`
+}
+
+// Specifies an open format table when creating a table in the Glue Data Catalog.
+type OpenTableFormatInput struct {
+	// Specifies an Apache Iceberg metadata table.
+	IcebergInput *IcebergInput `json:"icebergInput,omitempty"`
 }
 
 // A structure used to define a table.

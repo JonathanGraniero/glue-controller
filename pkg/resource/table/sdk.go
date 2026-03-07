@@ -30,6 +30,7 @@ import (
 	ackrtlog "github.com/aws-controllers-k8s/runtime/pkg/runtime/log"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	svcsdk "github.com/aws/aws-sdk-go-v2/service/glue"
+	svcsdktypes "github.com/aws/aws-sdk-go-v2/service/glue/types"
 	smithy "github.com/aws/smithy-go"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -168,6 +169,12 @@ func (rm *resourceManager) sdkFind(
 		ko.Spec.ViewOriginalText = nil
 	}
 
+	obs := &resource{ko}
+	ko.Spec.PartitionIndexes, err = rm.getPartitionIndexes(ctx, obs)
+	if err != nil {
+		return nil, err
+	}
+
 	rm.setStatusDefaults(ko)
 	if ko.Status.ACKResourceMetadata == nil {
 		ko.Status.ACKResourceMetadata = &ackv1alpha1.ResourceMetadata{}
@@ -175,7 +182,7 @@ func (rm *resourceManager) sdkFind(
 	arn := ackv1alpha1.AWSResourceName(tableARN(ko))
 	ko.Status.ACKResourceMetadata.ARN = &arn
 
-	return &resource{ko}, nil
+	return obs, nil
 }
 
 // requiredFieldsMissingFromReadOneInput returns true if there are any fields
@@ -263,6 +270,42 @@ func (rm *resourceManager) newCreateRequestPayload(
 	if r.ko.Spec.DatabaseName != nil {
 		res.DatabaseName = r.ko.Spec.DatabaseName
 	}
+	if r.ko.Spec.PartitionIndexes != nil {
+		indexes := []svcsdktypes.PartitionIndex{}
+		for _, pi := range r.ko.Spec.PartitionIndexes {
+			if pi == nil {
+				continue
+			}
+			sdkPI := svcsdktypes.PartitionIndex{}
+			if pi.IndexName != nil {
+				sdkPI.IndexName = pi.IndexName
+			}
+			if pi.Keys != nil {
+				keys := []string{}
+				for _, k := range pi.Keys {
+					if k != nil {
+						keys = append(keys, *k)
+					}
+				}
+				sdkPI.Keys = keys
+			}
+			indexes = append(indexes, sdkPI)
+		}
+		res.PartitionIndexes = indexes
+	}
+	if r.ko.Spec.OpenTableFormatInput != nil && r.ko.Spec.OpenTableFormatInput.IcebergInput != nil {
+		ii := r.ko.Spec.OpenTableFormatInput.IcebergInput
+		icebergInput := &svcsdktypes.IcebergInput{}
+		if ii.MetadataOperation != nil {
+			icebergInput.MetadataOperation = svcsdktypes.MetadataOperation(*ii.MetadataOperation)
+		}
+		if ii.Version != nil {
+			icebergInput.Version = ii.Version
+		}
+		res.OpenTableFormatInput = &svcsdktypes.OpenTableFormatInput{
+			IcebergInput: icebergInput,
+		}
+	}
 
 	return res, nil
 }
@@ -295,6 +338,10 @@ func (rm *resourceManager) sdkUpdate(
 	resp, err = rm.sdkapi.UpdateTable(ctx, input)
 	rm.metrics.RecordAPICall("UPDATE", "UpdateTable", err)
 	if err != nil {
+		return nil, err
+	}
+
+	if err = rm.syncPartitionIndexes(ctx, desired, latest); err != nil {
 		return nil, err
 	}
 

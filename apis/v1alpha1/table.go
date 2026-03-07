@@ -44,12 +44,21 @@ type TableSpec struct {
 	// +kubebuilder:validation:Required
 	Name *string `json:"name"`
 
+	// Specifies an open format table (e.g. Apache Iceberg) when creating the table.
+	// This field is immutable after creation.
+	OpenTableFormatInput *OpenTableFormatInput `json:"openTableFormatInput,omitempty"`
+
 	// The table owner. Included for Apache Hive compatibility. Not used in the
 	// normal course of Glue operations.
 	Owner *string `json:"owner,omitempty"`
 
 	// These key-value pairs define properties associated with the table.
 	Parameters map[string]*string `json:"parameters,omitempty"`
+
+	// A list of partition indexes for the table. The controller reconciles this
+	// list by calling CreatePartitionIndex for additions and DeletePartitionIndex
+	// for removals. Indexes passed at creation time are created via CreateTableInput.
+	PartitionIndexes []*PartitionIndex `json:"partitionIndexes,omitempty"`
 
 	// A list of columns by which the table is partitioned. Only primitive types
 	// are supported as partition keys.
