@@ -20,7 +20,7 @@ ignore:
       - Script
       - SecurityConfiguration
       - Session
-      - Table
+      # - Table
       - TableOptimizer
       - Trigger
       - UsageProfile
@@ -123,7 +123,79 @@ resources:
       terminal_codes:
         - InvalidInputException
       errors:
-        404: 
+        404:
+         code: EntityNotFoundException
+  Table:
+    fields:
+      Name:
+        is_primary_key: true
+        from:
+          operation: GetTable
+          path: Table.Name
+      DatabaseName:
+        from:
+          operation: GetTable
+          path: Table.DatabaseName
+      Description:
+        from:
+          operation: GetTable
+          path: Table.Description
+      Owner:
+        from:
+          operation: GetTable
+          path: Table.Owner
+      Parameters:
+        from:
+          operation: GetTable
+          path: Table.Parameters
+      PartitionKeys:
+        from:
+          operation: GetTable
+          path: Table.PartitionKeys
+      Retention:
+        from:
+          operation: GetTable
+          path: Table.Retention
+      StorageDescriptor:
+        from:
+          operation: GetTable
+          path: Table.StorageDescriptor
+      TableType:
+        from:
+          operation: GetTable
+          path: Table.TableType
+      TargetTable:
+        from:
+          operation: GetTable
+          path: Table.TargetTable
+      ViewExpandedText:
+        from:
+          operation: GetTable
+          path: Table.ViewExpandedText
+      ViewOriginalText:
+        from:
+          operation: GetTable
+          path: Table.ViewOriginalText
+      Tags:
+        type: map[string]*string
+    hooks:
+      sdk_create_post_build_request:
+        template_path: hooks/table/sdk_create_post_build_request.go.tpl
+      sdk_create_post_set_output:
+        template_path: hooks/table/sdk_create_post_set_output.go.tpl
+      sdk_update_pre_build_request:
+        template_path: hooks/table/sdk_update_pre_build_request.go.tpl
+      sdk_update_post_build_request:
+        template_path: hooks/table/sdk_update_post_build_request.go.tpl
+      sdk_read_one_post_set_output:
+        template_path: hooks/table/sdk_read_one_post_set_output.go.tpl
+      sdk_file_end:
+        template_path: hooks/table/sdk_file_end.go.tpl
+    exceptions:
+      terminal_codes:
+        - InvalidInputException
+      errors:
+        404:
          code: EntityNotFoundException
 
-      
+
