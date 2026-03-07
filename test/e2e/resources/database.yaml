@@ -1,0 +1,7 @@
+apiVersion: glue.services.k8s.aws/v1alpha1
+kind: Database
+metadata:
+  name: $DATABASE_NAME
+spec:
+  name: $DATABASE_NAME
+  description: Test database for ACK integration tests
