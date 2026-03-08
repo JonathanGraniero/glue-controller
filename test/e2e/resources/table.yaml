@@ -1,0 +1,27 @@
+apiVersion: glue.services.k8s.aws/v1alpha1
+kind: Table
+metadata:
+  name: $TABLE_NAME
+spec:
+  name: $TABLE_NAME
+  databaseName: $DATABASE_NAME
+  description: Test table for ACK integration tests
+  tableType: EXTERNAL_TABLE
+  storageDescriptor:
+    location: s3://ack-glue-test-bucket/test-table/
+    inputFormat: org.apache.hadoop.mapred.TextInputFormat
+    outputFormat: org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat
+    compressed: false
+    serdeInfo:
+      serializationLibrary: org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe
+      parameters:
+        field.delim: ","
+    columns:
+      - name: id
+        type: string
+        comment: Unique identifier
+      - name: value
+        type: bigint
+        comment: Numeric value
+  parameters:
+    classification: csv

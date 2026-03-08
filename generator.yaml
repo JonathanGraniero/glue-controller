@@ -20,14 +20,13 @@ ignore:
       - Script
       - SecurityConfiguration
       - Session
-      - Table
+      # - Table
       - TableOptimizer
       - Trigger
       - UsageProfile
       - UserDefinedFunction
       - Workflow
   shape_names:
-      - Column
       - KeySchemaElement
   field_paths:
       - Mapping.Children
@@ -35,6 +34,14 @@ ignore:
       - UpdateJobInput.JobUpdate.AllocatedCapacity
       - CreateDatabaseInput.DatabaseInput
       - UpdateDatabaseInput.DatabaseInput
+      - CreateTableInput.TableInput
+      - UpdateTableInput.TableUpdate
+      - CreateTableInput.TransactionId
+      - UpdateTableInput.TransactionId
+      - UpdateTableInput.SkipArchive
+      - UpdateTableInput.VersionId
+      - UpdateTableInput.ViewUpdateAction
+      - UpdateTableInput.Force
 resources:
   Job:
     renames:
@@ -123,7 +130,97 @@ resources:
       terminal_codes:
         - InvalidInputException
       errors:
-        404: 
+        404:
+         code: EntityNotFoundException
+  Table:
+    tags:
+      ignore: true
+    fields:
+      Name:
+        is_primary_key: true
+        is_required: true
+        from:
+          operation: GetTable
+          path: Table.Name
+      CatalogID:
+        compare:
+          is_ignored: true
+      DatabaseName:
+        from:
+          operation: GetTable
+          path: Table.DatabaseName
+      Description:
+        from:
+          operation: GetTable
+          path: Table.Description
+      Owner:
+        from:
+          operation: GetTable
+          path: Table.Owner
+      Parameters:
+        from:
+          operation: GetTable
+          path: Table.Parameters
+      OpenTableFormatInput:
+        compare:
+          is_ignored: true
+      PartitionIndexes:
+        compare:
+          is_ignored: true
+      PartitionKeys:
+        from:
+          operation: GetTable
+          path: Table.PartitionKeys
+      Retention:
+        from:
+          operation: GetTable
+          path: Table.Retention
+      StorageDescriptor:
+        from:
+          operation: GetTable
+          path: Table.StorageDescriptor
+      TableType:
+        from:
+          operation: GetTable
+          path: Table.TableType
+      TargetTable:
+        from:
+          operation: GetTable
+          path: Table.TargetTable
+      ViewExpandedText:
+        from:
+          operation: GetTable
+          path: Table.ViewExpandedText
+      ViewOriginalText:
+        from:
+          operation: GetTable
+          path: Table.ViewOriginalText
+      StorageDescriptor.Columns.Type:
+        go_tag: json:"type,omitempty"
+      PartitionKeys.Type:
+        go_tag: json:"type,omitempty"
+    hooks:
+      sdk_create_post_build_request:
+        template_path: hooks/table/sdk_create_post_build_request.go.tpl
+      sdk_create_post_set_output:
+        template_path: hooks/table/sdk_create_post_set_output.go.tpl
+      sdk_update_pre_build_request:
+        template_path: hooks/table/sdk_update_pre_build_request.go.tpl
+      sdk_update_post_build_request:
+        template_path: hooks/table/sdk_update_post_build_request.go.tpl
+      sdk_update_post_set_output:
+        template_path: hooks/table/sdk_update_post_set_output.go.tpl
+      sdk_read_one_post_set_output:
+        template_path: hooks/table/sdk_read_one_post_set_output.go.tpl
+      sdk_file_end:
+        template_path: hooks/table/sdk_file_end.go.tpl
+      delta_post_compare:
+        template_path: hooks/table/delta_post_compare.go.tpl
+    exceptions:
+      terminal_codes:
+        - InvalidInputException
+      errors:
+        404:
          code: EntityNotFoundException
 
-      
+
