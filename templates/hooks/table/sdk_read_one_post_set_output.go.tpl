@@ -3,4 +3,3 @@
 	}
 	arn := ackv1alpha1.AWSResourceName(tableARN(ko))
 	ko.Status.ACKResourceMetadata.ARN = &arn
-	ko.Spec.Tags, err = rm.getTags(ctx, string(*ko.Status.ACKResourceMetadata.ARN))
