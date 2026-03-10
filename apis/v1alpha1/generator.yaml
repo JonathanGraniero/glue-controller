@@ -96,7 +96,7 @@ resources:
         from:
           operation: GetDatabase
           path: Database.Parameters
-      CreateTableDefaultPermissions:
+      TableDefaultPermissions:
         from:
           operation: GetDatabase
           path: Database.CreateTableDefaultPermissions

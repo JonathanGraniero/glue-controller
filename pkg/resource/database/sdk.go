@@ -116,9 +116,9 @@ func (rm *resourceManager) sdkFind(
 			}
 			f1 = append(f1, f1elem)
 		}
-		ko.Spec.CreateTableDefaultPermissions = f1
+		ko.Spec.TableDefaultPermissions = f1
 	} else {
-		ko.Spec.CreateTableDefaultPermissions = nil
+		ko.Spec.TableDefaultPermissions = nil
 	}
 	if resp.Database.Description != nil {
 		ko.Spec.Description = resp.Database.Description

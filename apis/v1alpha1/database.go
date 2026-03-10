@@ -33,7 +33,7 @@ type DatabaseSpec struct {
 	CatalogID *string `json:"catalogID,omitempty"`
 	// Creates a set of default permissions on the table for principals. Used by
 	// Lake Formation. Not used in the normal course of Glue operations.
-	CreateTableDefaultPermissions []*PrincipalPermissions `json:"createTableDefaultPermissions,omitempty"`
+	TableDefaultPermissions []*PrincipalPermissions `json:"tableDefaultPermissions,omitempty"`
 	// A description of the database.
 	//
 	// Regex Pattern: `^[\u0020-\uD7FF\uE000-\uFFFD\uD800\uDC00-\uDBFF\uDFFF\r\n\t]*$`

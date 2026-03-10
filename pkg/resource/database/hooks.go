@@ -42,9 +42,9 @@ func (rm *resourceManager) buildDatabaseInput(
 	if r.ko.Spec.Parameters != nil {
 		databaseInput.Parameters = aws.ToStringMap(r.ko.Spec.Parameters)
 	}
-	if r.ko.Spec.CreateTableDefaultPermissions != nil {
+	if r.ko.Spec.TableDefaultPermissions != nil {
 		perms := []svcsdktypes.PrincipalPermissions{}
-		for _, p := range r.ko.Spec.CreateTableDefaultPermissions {
+		for _, p := range r.ko.Spec.TableDefaultPermissions {
 			elem := svcsdktypes.PrincipalPermissions{}
 			if p.Permissions != nil {
 				pp := []svcsdktypes.Permission{}

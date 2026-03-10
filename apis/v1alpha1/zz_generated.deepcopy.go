@@ -3133,8 +3133,8 @@ func (in *DatabaseSpec) DeepCopyInto(out *DatabaseSpec) {
 		*out = new(string)
 		**out = **in
 	}
-	if in.CreateTableDefaultPermissions != nil {
-		in, out := &in.CreateTableDefaultPermissions, &out.CreateTableDefaultPermissions
+	if in.TableDefaultPermissions != nil {
+		in, out := &in.TableDefaultPermissions, &out.TableDefaultPermissions
 		*out = make([]*PrincipalPermissions, len(*in))
 		for i := range *in {
 			if (*in)[i] != nil {
