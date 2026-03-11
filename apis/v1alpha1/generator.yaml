@@ -35,6 +35,9 @@ ignore:
       - UpdateJobInput.JobUpdate.AllocatedCapacity
       - CreateDatabaseInput.DatabaseInput
       - UpdateDatabaseInput.DatabaseInput
+operations:
+  GetDatabase:
+    output_wrapper_field_path: Database
 resources:
   Job:
     renames:

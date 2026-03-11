@@ -49,13 +49,6 @@ func newResourceDelta(
 			delta.Add("Spec.CatalogID", a.ko.Spec.CatalogID, b.ko.Spec.CatalogID)
 		}
 	}
-	if len(a.ko.Spec.TableDefaultPermissions) != len(b.ko.Spec.TableDefaultPermissions) {
-		delta.Add("Spec.TableDefaultPermissions", a.ko.Spec.TableDefaultPermissions, b.ko.Spec.TableDefaultPermissions)
-	} else if len(a.ko.Spec.TableDefaultPermissions) > 0 {
-		if !equality.Semantic.Equalities.DeepEqual(a.ko.Spec.TableDefaultPermissions, b.ko.Spec.TableDefaultPermissions) {
-			delta.Add("Spec.TableDefaultPermissions", a.ko.Spec.TableDefaultPermissions, b.ko.Spec.TableDefaultPermissions)
-		}
-	}
 	if ackcompare.HasNilDifference(a.ko.Spec.Description, b.ko.Spec.Description) {
 		delta.Add("Spec.Description", a.ko.Spec.Description, b.ko.Spec.Description)
 	} else if a.ko.Spec.Description != nil && b.ko.Spec.Description != nil {
@@ -100,6 +93,13 @@ func newResourceDelta(
 	} else if len(a.ko.Spec.Parameters) > 0 {
 		if !ackcompare.MapStringStringPEqual(a.ko.Spec.Parameters, b.ko.Spec.Parameters) {
 			delta.Add("Spec.Parameters", a.ko.Spec.Parameters, b.ko.Spec.Parameters)
+		}
+	}
+	if len(a.ko.Spec.TableDefaultPermissions) != len(b.ko.Spec.TableDefaultPermissions) {
+		delta.Add("Spec.TableDefaultPermissions", a.ko.Spec.TableDefaultPermissions, b.ko.Spec.TableDefaultPermissions)
+	} else if len(a.ko.Spec.TableDefaultPermissions) > 0 {
+		if !equality.Semantic.Equalities.DeepEqual(a.ko.Spec.TableDefaultPermissions, b.ko.Spec.TableDefaultPermissions) {
+			delta.Add("Spec.TableDefaultPermissions", a.ko.Spec.TableDefaultPermissions, b.ko.Spec.TableDefaultPermissions)
 		}
 	}
 	desiredACKTags, _ := convertToOrderedACKTags(a.ko.Spec.Tags)

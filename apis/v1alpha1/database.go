@@ -31,9 +31,6 @@ type DatabaseSpec struct {
 	//
 	// Regex Pattern: `^[\u0020-\uD7FF\uE000-\uFFFD\uD800\uDC00-\uDBFF\uDFFF\t]*$`
 	CatalogID *string `json:"catalogID,omitempty"`
-	// Creates a set of default permissions on the table for principals. Used by
-	// Lake Formation. Not used in the normal course of Glue operations.
-	TableDefaultPermissions []*PrincipalPermissions `json:"tableDefaultPermissions,omitempty"`
 	// A description of the database.
 	//
 	// Regex Pattern: `^[\u0020-\uD7FF\uE000-\uFFFD\uD800\uDC00-\uDBFF\uDFFF\r\n\t]*$`
@@ -52,7 +49,10 @@ type DatabaseSpec struct {
 	Name *string `json:"name,omitempty"`
 	// These key-value pairs define parameters and properties of the database.
 	Parameters map[string]*string `json:"parameters,omitempty"`
-	Tags       map[string]*string `json:"tags,omitempty"`
+	// Creates a set of default permissions on the table for principals. Used by
+	// Lake Formation. Not used in the normal course of Glue operations.
+	TableDefaultPermissions []*PrincipalPermissions `json:"tableDefaultPermissions,omitempty"`
+	Tags                    map[string]*string      `json:"tags,omitempty"`
 }
 
 // DatabaseStatus defines the observed state of Database

@@ -94,32 +94,6 @@ func (rm *resourceManager) sdkFind(
 	} else {
 		ko.Spec.CatalogID = nil
 	}
-	if resp.Database.CreateTableDefaultPermissions != nil {
-		f1 := []*svcapitypes.PrincipalPermissions{}
-		for _, f1iter := range resp.Database.CreateTableDefaultPermissions {
-			f1elem := &svcapitypes.PrincipalPermissions{}
-			if f1iter.Permissions != nil {
-				f1elemf0 := []*string{}
-				for _, f1elemf0iter := range f1iter.Permissions {
-					var f1elemf0elem *string
-					f1elemf0elem = aws.String(string(f1elemf0iter))
-					f1elemf0 = append(f1elemf0, f1elemf0elem)
-				}
-				f1elem.Permissions = f1elemf0
-			}
-			if f1iter.Principal != nil {
-				f1elemf1 := &svcapitypes.DataLakePrincipal{}
-				if f1iter.Principal.DataLakePrincipalIdentifier != nil {
-					f1elemf1.DataLakePrincipalIdentifier = f1iter.Principal.DataLakePrincipalIdentifier
-				}
-				f1elem.Principal = f1elemf1
-			}
-			f1 = append(f1, f1elem)
-		}
-		ko.Spec.TableDefaultPermissions = f1
-	} else {
-		ko.Spec.TableDefaultPermissions = nil
-	}
 	if resp.Database.Description != nil {
 		ko.Spec.Description = resp.Database.Description
 	} else {
