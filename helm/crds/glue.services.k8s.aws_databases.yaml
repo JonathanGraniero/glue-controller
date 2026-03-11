@@ -50,25 +50,6 @@ spec:
 
                   Regex Pattern: `^[\u0020-\uD7FF\uE000-\uFFFD\uD800\uDC00-\uDBFF\uDFFF\t]*$`
                 type: string
-              createTableDefaultPermissions:
-                description: |-
-                  Creates a set of default permissions on the table for principals. Used by
-                  Lake Formation. Not used in the normal course of Glue operations.
-                items:
-                  description: Permissions granted to a principal.
-                  properties:
-                    permissions:
-                      items:
-                        type: string
-                      type: array
-                    principal:
-                      description: The Lake Formation principal.
-                      properties:
-                        dataLakePrincipalIdentifier:
-                          type: string
-                      type: object
-                  type: object
-                type: array
               description:
                 description: |-
                   A description of the database.
@@ -104,6 +85,25 @@ spec:
                 description: These key-value pairs define parameters and properties
                   of the database.
                 type: object
+              tableDefaultPermissions:
+                description: |-
+                  Creates a set of default permissions on the table for principals. Used by
+                  Lake Formation. Not used in the normal course of Glue operations.
+                items:
+                  description: Permissions granted to a principal.
+                  properties:
+                    permissions:
+                      items:
+                        type: string
+                      type: array
+                    principal:
+                      description: The Lake Formation principal.
+                      properties:
+                        dataLakePrincipalIdentifier:
+                          type: string
+                      type: object
+                  type: object
+                type: array
               tags:
                 additionalProperties:
                   type: string
