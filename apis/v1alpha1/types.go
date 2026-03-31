@@ -1551,7 +1551,8 @@ type OracleSQLCatalogTarget struct {
 
 // Specifies the sort order of a sorted column.
 type Order struct {
-	Column *string `json:"column,omitempty"`
+	Column    *string `json:"column,omitempty"`
+	SortOrder *int64  `json:"sortOrder,omitempty"`
 }
 
 // Specifies a transform that identifies, removes or masks PII data.
@@ -1579,7 +1580,15 @@ type Partition struct {
 
 // A structure for a partition index.
 type PartitionIndex struct {
-	IndexName *string `json:"indexName,omitempty"`
+	// The name of the partition index.
+	//
+	// +kubebuilder:validation:Required
+	IndexName *string `json:"indexName"`
+
+	// The keys (column names) for the partition index.
+	//
+	// +kubebuilder:validation:Required
+	Keys []*string `json:"keys"`
 }
 
 // A descriptor for a partition index in a table.
@@ -2148,7 +2157,49 @@ type StatisticSummary struct {
 
 // Describes the physical storage of table data.
 type StorageDescriptor struct {
+	AdditionalLocations    []*string          `json:"additionalLocations,omitempty"`
+	BucketColumns          []*string          `json:"bucketColumns,omitempty"`
+	Columns                []*Column          `json:"columns,omitempty"`
+	Compressed             *bool              `json:"compressed,omitempty"`
+	InputFormat            *string            `json:"inputFormat,omitempty"`
+	Location               *string            `json:"location,omitempty"`
+	NumberOfBuckets        *int64             `json:"numberOfBuckets,omitempty"`
+	OutputFormat           *string            `json:"outputFormat,omitempty"`
+	Parameters             map[string]*string `json:"parameters,omitempty"`
+	SchemaReference        *SchemaReference   `json:"schemaReference,omitempty"`
+	SerdeInfo              *SerDeInfo         `json:"serdeInfo,omitempty"`
+	SkewedInfo             *SkewedInfo        `json:"skewedInfo,omitempty"`
+	SortColumns            []*Order           `json:"sortColumns,omitempty"`
+	StoredAsSubDirectories *bool              `json:"storedAsSubDirectories,omitempty"`
+}
+
+// A column in a Glue table.
+type Column struct {
+	Comment    *string            `json:"comment,omitempty"`
+	Name       *string            `json:"name,omitempty"`
 	Parameters map[string]*string `json:"parameters,omitempty"`
+	Type       *string            `json:"type,omitempty"`
+}
+
+// An object that contains schema identity fields.
+type SchemaID struct {
+	RegistryName *string `json:"registryName,omitempty"`
+	SchemaARN    *string `json:"schemaARN,omitempty"`
+	SchemaName   *string `json:"schemaName,omitempty"`
+}
+
+// An object that references a schema stored in the Glue Schema Registry.
+type SchemaReference struct {
+	SchemaID            *SchemaID `json:"schemaID,omitempty"`
+	SchemaVersionID     *string   `json:"schemaVersionID,omitempty"`
+	SchemaVersionNumber *int64    `json:"schemaVersionNumber,omitempty"`
+}
+
+// Specifies skewed values in a table.
+type SkewedInfo struct {
+	SkewedColumnNames             []*string          `json:"skewedColumnNames,omitempty"`
+	SkewedColumnValueLocationMaps map[string]*string `json:"skewedColumnValueLocationMaps,omitempty"`
+	SkewedColumnValues            []*string          `json:"skewedColumnValues,omitempty"`
 }
 
 // Specifies options related to data preview for viewing a sample of your data.
@@ -2159,7 +2210,7 @@ type StreamingDataPreviewOptions struct {
 
 // The database and table in the Glue Data Catalog that is used for input or
 // output data.
-type Table struct {
+type TableReference struct {
 	CatalogID      *string `json:"catalogID,omitempty"`
 	ConnectionName *string `json:"connectionName,omitempty"`
 	DatabaseName   *string `json:"databaseName,omitempty"`
@@ -2195,6 +2246,23 @@ type TableIdentifier struct {
 	Region       *string `json:"region,omitempty"`
 }
 
+// Specifies an Apache Iceberg data store stored in Amazon S3.
+type IcebergInput struct {
+	// A required metadata operation. The only allowed value is "CREATE".
+	//
+	// +kubebuilder:validation:Required
+	MetadataOperation *string `json:"metadataOperation"`
+
+	// The table version for the Iceberg table. Defaults to 2.
+	Version *string `json:"version,omitempty"`
+}
+
+// Specifies an open format table when creating a table in the Glue Data Catalog.
+type OpenTableFormatInput struct {
+	// Specifies an Apache Iceberg metadata table.
+	IcebergInput *IcebergInput `json:"icebergInput,omitempty"`
+}
+
 // A structure used to define a table.
 type TableInput struct {
 	Description      *string            `json:"description,omitempty"`
@@ -2213,7 +2281,7 @@ type TableOptimizerConfiguration struct {
 
 // A structure containing information about the state of an asynchronous change
 // to a table.
-type TableStatus struct {
+type TableStatusData struct {
 	RequestTime *metav1.Time `json:"requestTime,omitempty"`
 	RequestedBy *string      `json:"requestedBy,omitempty"`
 	UpdateTime  *metav1.Time `json:"updateTime,omitempty"`
