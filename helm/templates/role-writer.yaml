@@ -18,6 +18,7 @@ rules:
   resources:
   - databases
   - jobs
+  - securityconfigurations
   verbs:
   - create
   - delete
@@ -31,6 +32,7 @@ rules:
   resources:
   - databases
   - jobs
+  - securityconfigurations
   verbs:
   - get
   - patch

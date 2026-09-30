@@ -18,7 +18,7 @@ ignore:
       - Registry
       - Schema
       - Script
-      - SecurityConfiguration
+      # - SecurityConfiguration
       - Session
       - Table
       - TableOptimizer
@@ -40,6 +40,8 @@ operations:
     input_wrapper_field_path: DatabaseInput
   GetDatabase:
     output_wrapper_field_path: Database
+  GetSecurityConfiguration:
+    output_wrapper_field_path: SecurityConfiguration
 resources:
   Job:
     renames:
@@ -128,5 +130,20 @@ resources:
       errors:
         404: 
          code: EntityNotFoundException
-
-      
+  SecurityConfiguration:
+    fields:
+      Name:
+        is_required: true
+        is_immutable: true
+      EncryptionConfiguration:
+        is_immutable: true
+        compare:
+          is_ignored: true
+    tags:
+      ignore: true
+    exceptions:
+      terminal_codes:
+        - InvalidInputException
+      errors:
+        404:
+          code: EntityNotFoundException

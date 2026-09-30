@@ -1,0 +1,13 @@
+apiVersion: glue.services.k8s.aws/v1alpha1
+kind: SecurityConfiguration
+metadata:
+  name: $SECURITY_CONFIGURATION_NAME
+spec:
+  name: $SECURITY_CONFIGURATION_NAME
+  encryptionConfiguration:
+    s3Encryption:
+      - s3EncryptionMode: SSE-S3
+    cloudWatchEncryption:
+      cloudWatchEncryptionMode: DISABLED
+    jobBookmarksEncryption:
+      jobBookmarksEncryptionMode: DISABLED

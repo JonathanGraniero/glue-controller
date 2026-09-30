@@ -44,6 +44,7 @@ import (
 
 	_ "github.com/aws-controllers-k8s/glue-controller/pkg/resource/database"
 	_ "github.com/aws-controllers-k8s/glue-controller/pkg/resource/job"
+	_ "github.com/aws-controllers-k8s/glue-controller/pkg/resource/security_configuration"
 
 	"github.com/aws-controllers-k8s/glue-controller/pkg/version"
 )

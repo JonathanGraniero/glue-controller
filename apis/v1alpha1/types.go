@@ -266,6 +266,12 @@ type CatalogTarget struct {
 	DatabaseName *string `json:"databaseName,omitempty"`
 }
 
+// Specifies how Amazon CloudWatch data should be encrypted.
+type CloudWatchEncryption struct {
+	CloudWatchEncryptionMode *string `json:"cloudWatchEncryptionMode,omitempty"`
+	KMSKeyARN                *string `json:"kmsKeyARN,omitempty"`
+}
+
 // CodeGenConfigurationNode enumerates all valid Node types. One and only one
 // of its member variables can be populated.
 type CodeGenConfigurationNode struct {
@@ -939,6 +945,15 @@ type EncryptionAtRest struct {
 	SSEAWSKMSKeyID *string `json:"sseAWSKMSKeyID,omitempty"`
 }
 
+// Specifies an encryption configuration.
+type EncryptionConfiguration struct {
+	// Specifies how Amazon CloudWatch data should be encrypted.
+	CloudWatchEncryption *CloudWatchEncryption `json:"cloudWatchEncryption,omitempty"`
+	// Specifies how job bookmark data should be encrypted.
+	JobBookmarksEncryption *JobBookmarksEncryption `json:"jobBookmarksEncryption,omitempty"`
+	S3Encryption           []*S3Encryption         `json:"s3Encryption,omitempty"`
+}
+
 // Contains details about an error.
 type ErrorDetail struct {
 	ErrorCode    *string `json:"errorCode,omitempty"`
@@ -1160,6 +1175,12 @@ type JobBookmarkEntry struct {
 	Attempt *int64 `json:"attempt,omitempty"`
 	Run     *int64 `json:"run,omitempty"`
 	Version *int64 `json:"version,omitempty"`
+}
+
+// Specifies how job bookmark data should be encrypted.
+type JobBookmarksEncryption struct {
+	JobBookmarksEncryptionMode *string `json:"jobBookmarksEncryptionMode,omitempty"`
+	KMSKeyARN                  *string `json:"kmsKeyARN,omitempty"`
 }
 
 // Specifies code that runs when a job is run.
@@ -1767,6 +1788,12 @@ type S3DirectTarget struct {
 	SchemaChangePolicy *DirectSchemaChangePolicy `json:"schemaChangePolicy,omitempty"`
 }
 
+// Specifies how Amazon Simple Storage Service (Amazon S3) data should be encrypted.
+type S3Encryption struct {
+	KMSKeyARN        *string `json:"kmsKeyARN,omitempty"`
+	S3EncryptionMode *string `json:"s3EncryptionMode,omitempty"`
+}
+
 // Specifies a data target that writes to Amazon S3 in Apache Parquet columnar
 // storage.
 type S3GlueParquetTarget struct {
@@ -1878,9 +1905,11 @@ type SchemaListItem struct {
 }
 
 // Specifies a security configuration.
-type SecurityConfiguration struct {
+type SecurityConfiguration_SDK struct {
 	CreatedTimeStamp *metav1.Time `json:"createdTimeStamp,omitempty"`
-	Name             *string      `json:"name,omitempty"`
+	// Specifies an encryption configuration.
+	EncryptionConfiguration *EncryptionConfiguration `json:"encryptionConfiguration,omitempty"`
+	Name                    *string                  `json:"name,omitempty"`
 }
 
 // Specifies a transform that chooses the data property keys that you want to

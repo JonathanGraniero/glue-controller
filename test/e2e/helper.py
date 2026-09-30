@@ -52,3 +52,15 @@ class GlueValidator:
             return response['Tags']
         except self.glue_client.exceptions.EntityNotFoundException:
             return None
+
+    def get_security_configuration(self, security_configuration_name):
+        try:
+            response = self.glue_client.get_security_configuration(
+                Name=security_configuration_name,
+            )
+            return response['SecurityConfiguration']
+        except self.glue_client.exceptions.EntityNotFoundException:
+            return None
+
+    def security_configuration_exists(self, security_configuration_name):
+        return self.get_security_configuration(security_configuration_name) is not None

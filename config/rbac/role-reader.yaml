@@ -11,6 +11,7 @@ rules:
   resources:
   - databases
   - jobs
+  - securityconfigurations
   verbs:
   - get
   - list
